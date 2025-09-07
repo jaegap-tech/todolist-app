@@ -27,9 +27,9 @@
 ## 작업
 
 - [ ] 1.0 최소 프로젝트 설정
-  - [ ] 1.1 Vite + React + TypeScript 프로젝트 생성
-  - [ ] 1.2 styled-components 설치
-  - [ ] 1.3 기본 타입 정의 (Todo 인터페이스)
+  - [x] 1.1 Vite + React + TypeScript 프로젝트 생성
+  - [x] 1.2 styled-components 설치
+  - [x] 1.3 기본 타입 정의 (Todo 인터페이스)
   - [ ] 1.4 더미 데이터 정의
 
 - [ ] 2.0 기본 UI 구현

@@ -33,40 +33,57 @@ const Button = styled.button`
   }
 `;
 
+const VisuallyHiddenLabel = styled.label`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+`;
+
 const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave }) => {
   const [text, setText] = useState(todo.text);
-  const [hasError, setHasError] = useState(false); // New state for error
+  const [hasError, setHasError] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedText = text.trim();
 
     if (!trimmedText) {
-      setHasError(true); // Set error if empty
+      setHasError(true);
       return;
     }
 
-    setHasError(false); // Clear error if valid
+    setHasError(false);
     console.log('Updated Todo:', todo.id, trimmedText);
     onSave(todo.id, trimmedText);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
-    if (hasError && e.target.value.trim()) { // Clear error as user types
+    if (hasError && e.target.value.trim()) {
       setHasError(false);
     }
   };
 
   return (
     <Form onSubmit={handleSubmit}>
+      <VisuallyHiddenLabel htmlFor={`edit-todo-input-${todo.id}`}>Edit todo text</VisuallyHiddenLabel>
       <Input
+        id={`edit-todo-input-${todo.id}`}
         type="text"
         value={text}
-        onChange={handleChange} // Use new handleChange
-        hasError={hasError} // Pass hasError prop
+        onChange={handleChange}
+        hasError={hasError}
+        aria-invalid={hasError ? 'true' : 'false'}
+        aria-describedby={hasError ? `edit-todo-error-${todo.id}` : undefined}
       />
-      <Button type="submit">Save</Button>
+      {hasError && <span id={`edit-todo-error-${todo.id}`} style={{ color: 'red', fontSize: '0.8em' }}>Todo cannot be empty</span>}
+      <Button type="submit" aria-label={`Save changes for todo ${todo.id}`}>Save</Button>
     </Form>
   );
 };

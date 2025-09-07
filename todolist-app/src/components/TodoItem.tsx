@@ -15,10 +15,6 @@ const ListItem = styled.li`
   display: flex;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid #eee;
-  &:last-child {
-    border-bottom: none;
-  }
 `;
 
 const Checkbox = styled.input`
@@ -43,11 +39,11 @@ const Button = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  background-color: #007bff;
-  color: white;
+  font-size: 1em;
+  transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #007bff;
   }
 
   &.delete-button {
@@ -86,13 +82,14 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onToggle, onUpdate 
             type="checkbox"
             checked={todo.completed}
             onChange={() => onToggle(todo.id)}
+            aria-label={`Mark "${todo.text}" as ${todo.completed ? 'incomplete' : 'complete'}`}
           />
           <TodoText completed={todo.completed}>
             {todo.text}
           </TodoText>
           <ButtonGroup>
-            <Button onClick={() => setIsEditing(true)}>Edit</Button>
-            <Button className="delete-button" onClick={() => setShowConfirmDialog(true)}>Delete</Button>
+            <Button onClick={() => setIsEditing(true)} aria-label={`Edit "${todo.text}"`}>Edit</Button>
+            <Button className="delete-button" onClick={() => setShowConfirmDialog(true)} aria-label={`Delete "${todo.text}"`}>Delete</Button>
           </ButtonGroup>
         </>
       )}

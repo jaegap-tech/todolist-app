@@ -20,7 +20,11 @@ const Overlay = styled.div`
   z-index: 999;
 `;
 
-const DialogContent = styled.div`
+const DialogContent = styled.div.attrs({
+  role: 'dialog',
+  'aria-modal': 'true',
+  'aria-labelledby': 'dialog-message', // Link to the message element
+})`
   background-color: white;
   padding: 30px;
   border-radius: 8px;
@@ -29,7 +33,9 @@ const DialogContent = styled.div`
   min-width: 300px;
 `;
 
-const Message = styled.p`
+const Message = styled.p.attrs({
+  id: 'dialog-message', // ID for aria-labelledby
+})`
   margin-bottom: 20px;
   font-size: 1.1em;
   color: #333;
@@ -72,8 +78,8 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ message, onConf
       <DialogContent>
         <Message>{message}</Message>
         <ButtonGroup>
-          <Button className="confirm" onClick={onConfirm}>Confirm</Button>
-          <Button className="cancel" onClick={onCancel}>Cancel</Button>
+          <Button className="confirm" onClick={onConfirm} aria-label="Confirm deletion">Confirm</Button>
+          <Button className="cancel" onClick={onCancel} aria-label="Cancel deletion">Cancel</Button>
         </ButtonGroup>
       </DialogContent>
     </Overlay>

@@ -31,41 +31,58 @@ const Button = styled.button`
   }
 `;
 
+const VisuallyHiddenLabel = styled.label`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+`;
+
 const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
   const [text, setText] = useState('');
-  const [hasError, setHasError] = useState(false); // New state for error
+  const [hasError, setHasError] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedText = text.trim();
-    setText(''); // Always clear the input, regardless of validation
+    setText('');
 
     if (!trimmedText) {
-      setHasError(true); // Set error if empty
+      setHasError(true);
       return;
     }
 
-    setHasError(false); // Clear error if valid
+    setHasError(false);
     onAddTodo(trimmedText);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
-    if (hasError && e.target.value.trim()) { // Clear error as user types
+    if (hasError && e.target.value.trim()) {
       setHasError(false);
     }
   };
 
   return (
     <Form onSubmit={handleSubmit}>
+      <VisuallyHiddenLabel htmlFor="add-todo-input">Add new todo</VisuallyHiddenLabel>
       <Input
+        id="add-todo-input"
         type="text"
         placeholder="Add a new todo"
         value={text}
-        onChange={handleChange} // Use new handleChange
-        hasError={hasError} // Pass hasError prop
+        onChange={handleChange}
+        hasError={hasError}
+        aria-invalid={hasError ? 'true' : 'false'}
+        aria-describedby={hasError ? 'add-todo-error' : undefined}
       />
-      <Button type="submit">Add</Button>
+      {hasError && <span id="add-todo-error" style={{ color: 'red', fontSize: '0.8em' }}>Todo cannot be empty</span>}
+      <Button type="submit" aria-label="Add todo">Add</Button>
     </Form>
   );
 };

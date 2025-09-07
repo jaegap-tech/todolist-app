@@ -5,10 +5,11 @@ import TodoItem from './TodoItem';
 interface TodoListProps {
   todos: Todo[];
   onDelete: (id: number) => void;
-  onToggle: (id: number) => void; // Callback for toggling completion status
+  onToggle: (id: number) => void;
+  onUpdate: (id: number, newText: string) => void; // Missing this prop
 }
 
-const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onToggle }) => {
+const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onToggle, onUpdate }) => {
   // Create a mutable copy for sorting
   const sortedTodos = [...todos].sort((a, b) => {
     // Incomplete todos (false) come before completed todos (true)
@@ -29,7 +30,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onToggle }) => {
       <h2>Todo List</h2>
       <ul>
         {sortedTodos.map(todo => (
-          <TodoItem key={todo.id} todo={todo} onDelete={onDelete} onToggle={onToggle} />
+          <TodoItem key={todo.id} todo={todo} onDelete={onDelete} onToggle={onToggle} onUpdate={onUpdate} />
         ))}
       </ul>
     </div>

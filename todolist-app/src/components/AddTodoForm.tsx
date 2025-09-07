@@ -38,6 +38,7 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedText = text.trim();
+    setText(''); // Always clear the input, regardless of validation
 
     if (!trimmedText) {
       setHasError(true); // Set error if empty
@@ -46,7 +47,6 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
 
     setHasError(false); // Clear error if valid
     onAddTodo(trimmedText);
-    setText(''); // Clear input after successful submission
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

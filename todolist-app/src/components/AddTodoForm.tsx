@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 
-const AddTodoForm = () => {
+interface AddTodoFormProps {
+  onAddTodo: (text: string) => void;
+}
+
+const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
   const [text, setText] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text.trim()) return; // Don't add empty todos
-    console.log('New Todo:', text);
-    // The actual logic to add the todo will be in a later task
+    if (!text.trim()) return;
+    onAddTodo(text); // Call the prop function
     setText('');
   };
 

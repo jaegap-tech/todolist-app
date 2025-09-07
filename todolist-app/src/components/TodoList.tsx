@@ -1,10 +1,16 @@
 import React from 'react';
-import { DUMMY_TODOS } from '../data/todos';
+import type { Todo } from '../types/todo';
 import TodoItem from './TodoItem';
 
-const TodoList = () => {
+interface TodoListProps {
+  todos: Todo[];
+  onDelete: (id: number) => void;
+  onToggle: (id: number) => void; // Callback for toggling completion status
+}
+
+const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onToggle }) => {
   // Create a mutable copy for sorting
-  const sortedTodos = [...DUMMY_TODOS].sort((a, b) => {
+  const sortedTodos = [...todos].sort((a, b) => {
     // Incomplete todos (false) come before completed todos (true)
     // So, if a is completed and b is not, a comes after b (return 1)
     // If a is not completed and b is completed, a comes before b (return -1)
@@ -23,7 +29,7 @@ const TodoList = () => {
       <h2>Todo List</h2>
       <ul>
         {sortedTodos.map(todo => (
-          <TodoItem key={todo.id} todo={todo} />
+          <TodoItem key={todo.id} todo={todo} onDelete={onDelete} onToggle={onToggle} />
         ))}
       </ul>
     </div>

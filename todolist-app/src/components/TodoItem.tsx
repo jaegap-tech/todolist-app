@@ -8,7 +8,14 @@ interface TodoItemProps {
 const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
   return (
     <li>
-      {todo.text}
+      <input
+        type="checkbox"
+        checked={todo.completed}
+        // onChange will be added in a later task
+      />
+      <span style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}>
+        {todo.text}
+      </span>
     </li>
   );
 };

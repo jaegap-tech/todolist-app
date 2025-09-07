@@ -11,10 +11,10 @@ const Form = styled.form`
   margin-bottom: 20px;
 `;
 
-const Input = styled.input`
+const Input = styled.input<{ hasError: boolean }>`
   flex-grow: 1;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid ${({ hasError }) => (hasError ? 'red' : '#ccc')};
   border-radius: 4px;
 `;
 
@@ -33,15 +33,27 @@ const Button = styled.button`
 
 const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
   const [text, setText] = useState('');
+  const [hasError, setHasError] = useState(false); // New state for error
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedText = text.trim();
-    setText(''); // Always clear the input
 
-    if (!trimmedText) return;
+    if (!trimmedText) {
+      setHasError(true); // Set error if empty
+      return;
+    }
 
+    setHasError(false); // Clear error if valid
     onAddTodo(trimmedText);
+    setText(''); // Clear input after successful submission
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setText(e.target.value);
+    if (hasError && e.target.value.trim()) { // Clear error as user types
+      setHasError(false);
+    }
   };
 
   return (
@@ -50,7 +62,8 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
         type="text"
         placeholder="Add a new todo"
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={handleChange} // Use new handleChange
+        hasError={hasError} // Pass hasError prop
       />
       <Button type="submit">Add</Button>
     </Form>

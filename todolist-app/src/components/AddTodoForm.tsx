@@ -11,10 +11,10 @@ const Form = styled.form`
   margin-bottom: 20px;
 `;
 
-const Input = styled.input<{ hasError: boolean }>`
+const Input = styled.input<{ $hasError: boolean }>`
   flex-grow: 1;
   padding: 10px;
-  border: 1px solid ${({ hasError }) => (hasError ? 'red' : '#ccc')};
+  border: 1px solid ${({ $hasError }) => ($hasError ? 'red' : '#ccc')};
   border-radius: 4px;
 `;
 
@@ -77,7 +77,7 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
         placeholder="Add a new todo"
         value={text}
         onChange={handleChange}
-        hasError={hasError}
+        $hasError={hasError}
         aria-invalid={hasError ? 'true' : 'false'}
         aria-describedby={hasError ? 'add-todo-error' : undefined}
       />

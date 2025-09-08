@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { Todo } from '../types/todo';
 import styled from 'styled-components';
 
@@ -13,10 +13,10 @@ const Form = styled.form`
   margin-bottom: 20px;
 `;
 
-const Input = styled.input<{ hasError: boolean }>`
+const Input = styled.input<{ $hasError: boolean }>`
   flex-grow: 1;
   padding: 10px;
-  border: 1px solid ${({ hasError }) => (hasError ? 'red' : '#ccc')};
+  border: 1px solid ${({ $hasError }) => ($hasError ? 'red' : '#ccc')};
   border-radius: 4px;
 `;
 
@@ -48,6 +48,11 @@ const VisuallyHiddenLabel = styled.label`
 const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave }) => {
   const [text, setText] = useState(todo.text);
   const [hasError, setHasError] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,11 +79,12 @@ const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave }) => {
     <Form onSubmit={handleSubmit}>
       <VisuallyHiddenLabel htmlFor={`edit-todo-input-${todo.id}`}>Edit todo text</VisuallyHiddenLabel>
       <Input
+        ref={inputRef}
         id={`edit-todo-input-${todo.id}`}
         type="text"
         value={text}
         onChange={handleChange}
-        hasError={hasError}
+        $hasError={hasError}
         aria-invalid={hasError ? 'true' : 'false'}
         aria-describedby={hasError ? `edit-todo-error-${todo.id}` : undefined}
       />

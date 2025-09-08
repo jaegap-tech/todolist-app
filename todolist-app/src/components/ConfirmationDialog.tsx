@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 interface ConfirmationDialogProps {
@@ -73,13 +73,46 @@ const Button = styled.button`
 `;
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ message, onConfirm, onCancel }) => {
+  const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    confirmButtonRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onCancel();
+      } else if (event.key === 'Tab' || event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+        event.preventDefault();
+        if (event.shiftKey || event.key === 'ArrowLeft') {
+          if (document.activeElement === confirmButtonRef.current) {
+            cancelButtonRef.current?.focus();
+          } else {
+            confirmButtonRef.current?.focus();
+          }
+        } else { // Tab or ArrowRight
+          if (document.activeElement === cancelButtonRef.current) {
+            confirmButtonRef.current?.focus();
+          } else {
+            cancelButtonRef.current?.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onCancel]);
+
   return (
     <Overlay>
       <DialogContent>
         <Message>{message}</Message>
         <ButtonGroup>
-          <Button className="confirm" onClick={onConfirm} aria-label="Confirm deletion">Confirm</Button>
-          <Button className="cancel" onClick={onCancel} aria-label="Cancel deletion">Cancel</Button>
+          <Button ref={confirmButtonRef} className="confirm" onClick={onConfirm} aria-label="Confirm deletion">Confirm</Button>
+          <Button ref={cancelButtonRef} className="cancel" onClick={onCancel} aria-label="Cancel deletion">Cancel</Button>
         </ButtonGroup>
       </DialogContent>
     </Overlay>

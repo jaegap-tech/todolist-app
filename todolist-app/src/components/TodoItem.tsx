@@ -22,10 +22,10 @@ const Checkbox = styled.input`
   transform: scale(1.2);
 `;
 
-const TodoText = styled.span<{ completed: boolean }>`
+const TodoText = styled.span<{ $completed: boolean }>`
   flex-grow: 1;
-  text-decoration: ${({ completed }) => (completed ? 'line-through' : 'none')};
-  color: ${({ completed }) => (completed ? '#888' : '#333')};
+  text-decoration: ${({ $completed }) => ($completed ? 'line-through' : 'none')};
+  color: ${({ $completed }) => ($completed ? '#888' : '#333')};
 `;
 
 const ButtonGroup = styled.div`
@@ -84,7 +84,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onToggle, onUpdate 
             onChange={() => onToggle(todo.id)}
             aria-label={`Mark "${todo.text}" as ${todo.completed ? 'incomplete' : 'complete'}`}
           />
-          <TodoText completed={todo.completed}>
+          <TodoText $completed={todo.completed}>
             {todo.text}
           </TodoText>
           <ButtonGroup>

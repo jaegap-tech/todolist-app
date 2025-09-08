@@ -33,10 +33,6 @@ const StyledList = styled.ul`
 const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onToggle, onUpdate }) => {
   // Create a mutable copy for sorting
   const sortedTodos = [...todos].sort((a, b) => {
-    // Incomplete todos (false) come before completed todos (true)
-    // So, if a is completed and b is not, a comes after b (return 1)
-    // If a is not completed and b is completed, a comes before b (return -1)
-    // If both have the same completed status, maintain original order (return 0)
     if (a.completed && !b.completed) {
       return 1;
     }

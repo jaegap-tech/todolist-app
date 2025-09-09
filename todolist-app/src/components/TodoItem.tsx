@@ -32,6 +32,7 @@ const ListItem = styled.li`
 const Checkbox = styled.input`
   margin-right: 10px;
   transform: scale(1.2);
+  accent-color: ${({ theme }) => theme.checkbox}; // Use theme.checkbox for checkbox color
 `;
 
 const TodoTextContainer = styled.div`

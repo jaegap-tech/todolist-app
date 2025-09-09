@@ -3,6 +3,18 @@ import type { Todo } from '../types/todo';
 import EditTodoForm from './EditTodoForm';
 import ConfirmationDialog from './ConfirmationDialog';
 import styled from 'styled-components';
+import { tagColors } from '../styles/themes'; // Import tagColors
+
+// Helper function to get a consistent color for a tag
+const getTagColor = (tag: string) => {
+  const colors = Object.values(tagColors);
+  let hash = 0;
+  for (let i = 0; i < tag.length; i++) {
+    hash = tag.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash % colors.length);
+  return colors[index];
+};
 
 interface TodoItemProps {
   todo: Todo;
@@ -29,13 +41,13 @@ const TodoTextContainer = styled.div`
 
 const TodoText = styled.span<{ $completed: boolean }>`
   text-decoration: ${({ $completed }) => ($completed ? 'line-through' : 'none')};
-  color: ${({ $completed, theme }) => ($completed ? theme.completedText : theme.text)}; // Use theme.completedText and theme.text
+  color: ${({ $completed, theme }) => ($completed ? theme.completedText : theme.text)};
 `;
 
 const DueDate = styled.span`
   display: block;
   font-size: 0.8em;
-  color: ${({ theme }) => theme.secondaryText}; // Use theme.secondaryText
+  color: ${({ theme }) => theme.secondaryText};
   margin-top: 4px;
 `;
 
@@ -46,9 +58,9 @@ const TagContainer = styled.div`
   margin-top: 5px;
 `;
 
-const Tag = styled.span`
-  background-color: ${({ theme }) => theme.tagBackground}; // Use theme.tagBackground
-  color: ${({ theme }) => theme.tagText}; // Use theme.tagText
+const Tag = styled.span<{ $tagColor: string }>`
+  background-color: ${({ $tagColor }) => $tagColor};
+  color: white;
   padding: 3px 8px;
   border-radius: 4px;
   font-size: 0.7em;
@@ -69,13 +81,13 @@ const Button = styled.button`
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: ${({ theme }) => theme.primaryHover}; // Use theme.primaryHover
+    background-color: ${({ theme }) => theme.primaryHover};
   }
 
   &.delete-button {
-    background-color: ${({ theme }) => theme.danger}; // Use theme.danger
+    background-color: ${({ theme }) => theme.danger};
     &:hover {
-      background-color: ${({ theme }) => theme.dangerHover}; // Use theme.dangerHover
+      background-color: ${({ theme }) => theme.dangerHover};
     }
   }
 `;
@@ -122,7 +134,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onToggle, onUpdate 
             {todo.tags && todo.tags.length > 0 && (
               <TagContainer>
                 {todo.tags.map((tag, index) => (
-                  <Tag key={index}>{tag}</Tag>
+                  <Tag key={index} $tagColor={getTagColor(tag)}>{tag}</Tag>
                 ))}
               </TagContainer>
             )}

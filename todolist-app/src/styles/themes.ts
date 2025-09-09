@@ -1,19 +1,22 @@
 export const lightTheme = {
-  background: '#f0f2f5',
+  background: '#f5f7fa',
   cardBackground: '#ffffff',
-  text: '#333333',
-  secondaryText: '#666666',
-  border: '#e0e0e0',
-  primary: '#007bff',
-  primaryHover: '#0056b3',
-  danger: '#dc3545',
-  dangerHover: '#c82333',
-  checkbox: '#007bff',
-  completedText: '#888',
-  error: 'red',
-  emptyState: '#888',
+  text: '#1f2937',
+  secondaryText: '#6b7280',
+  border: '#e5e7eb',
+
+  primary: '#3b82f6',
+  primaryHover: '#3b82f6',
+  danger: '#ef4444',
+  dangerHover: '#ef4444',
+
+  checkbox: '#3b82f6',
+  completedText: '#10b981',
+  error: '#ef4444',
+  emptyState: '#6b7280',
+
   tagBackground: '#e0e0e0',
-  tagText: '#555',
+  tagText: '#1f2937',
 };
 
 export const darkTheme = {
@@ -32,6 +35,14 @@ export const darkTheme = {
   emptyState: '#bbbbbb',
   tagBackground: '#444444',
   tagText: '#f5f5f5',
+};
+
+export const tagColors = {
+  blue: '#3b82f6',
+  green: '#10b981',
+  orange: '#f59e0b',
+  red: '#ef4444',
+  purple: '#8b5cf6',
 };
 
 export type Theme = typeof lightTheme;

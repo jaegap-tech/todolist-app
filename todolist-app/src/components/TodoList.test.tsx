@@ -1,7 +1,29 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import TodoList from './TodoList';
 import { describe, it, expect, vi } from 'vitest';
 import type { Todo } from '../types/todo';
+
+// Mock ConfirmationDialog to control its behavior
+vi.mock('./ConfirmationDialog', () => ({
+  default: vi.fn(({ message, onConfirm, onCancel }) => (
+    <div data-testid="mock-confirmation-dialog">
+      <p>{message}</p>
+      <button onClick={onConfirm}>Mock Confirm</button>
+      <button onClick={onCancel}>Mock Cancel</button>
+    </div>
+  )),
+}));
+
+// Mock EditTodoForm to control its behavior
+vi.mock('./EditTodoForm', () => ({
+  default: vi.fn(({ todo, onSave }) => (
+    <form data-testid="mock-edit-todo-form">
+      <input type="text" value={todo.text} onChange={() => {}} />
+      <button onClick={() => onSave(todo.id, 'Updated Text')}>Mock Save</button>
+    </form>
+  )),
+}));
 
 describe('TodoList', () => {
   const mockTodos: Todo[] = [
@@ -28,6 +50,19 @@ describe('TodoList', () => {
     expect(screen.getByText('Todo 3')).toBeInTheDocument();
   });
 
+  it('renders correctly with an empty list', () => {
+    render(
+      <TodoList
+        todos={[]}
+        onDelete={mockOnDelete}
+        onToggle={mockOnToggle}
+        onUpdate={mockOnUpdate}
+      />
+    );
+    expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
+    expect(screen.getByText('Todo List')).toBeInTheDocument(); // Check if title is still there
+  });
+
   it('sorts completed todos to the bottom', () => {
     render(
       <TodoList
@@ -42,6 +77,56 @@ describe('TodoList', () => {
     expect(items[0]).toHaveTextContent('Todo 1');
     expect(items[1]).toHaveTextContent('Todo 3');
     expect(items[2]).toHaveTextContent('Todo 2');
+  });
+
+  it('calls onDelete with the correct id when delete is confirmed', async () => {
+    render(
+      <TodoList
+        todos={mockTodos}
+        onDelete={mockOnDelete}
+        onToggle={mockOnToggle}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
+    fireEvent.click(deleteButtons[0]); // Click delete for Todo 1
+
+    // Wait for the confirmation dialog to appear
+    await waitFor(() => {
+      expect(screen.getByTestId('mock-confirmation-dialog')).toBeInTheDocument();
+    });
+
+    // Click the confirm button in the dialog
+    fireEvent.click(screen.getByText('Mock Confirm'));
+
+    expect(mockOnDelete).toHaveBeenCalledTimes(1);
+    expect(mockOnDelete).toHaveBeenCalledWith(mockTodos[0].id); // Check if called with Todo 1's ID
+  });
+
+  it('calls onUpdate with the correct id and new text when edit is saved', async () => {
+    render(
+      <TodoList
+        todos={mockTodos}
+        onDelete={mockOnDelete}
+        onToggle={mockOnToggle}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    const editButtons = screen.getAllByRole('button', { name: /edit/i });
+    fireEvent.click(editButtons[0]); // Click edit for Todo 1
+
+    // Wait for the edit form to appear
+    await waitFor(() => {
+      expect(screen.getByTestId('mock-edit-todo-form')).toBeInTheDocument();
+    });
+
+    // Click the save button in the form
+    fireEvent.click(screen.getByText('Mock Save'));
+
+    expect(mockOnUpdate).toHaveBeenCalledTimes(1);
+    expect(mockOnUpdate).toHaveBeenCalledWith(mockTodos[0].id, 'Updated Text'); // Check if called with Todo 1's ID and new text
   });
 
   it('passes correct props to TodoItem', () => {

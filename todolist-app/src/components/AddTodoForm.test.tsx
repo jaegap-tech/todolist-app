@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import AddTodoForm from './AddTodoForm';
 import { describe, it, expect, vi } from 'vitest';
@@ -47,5 +48,44 @@ describe('AddTodoForm', () => {
 
     expect(handleAddTodo).not.toHaveBeenCalled();
     expect(input).toHaveValue(''); // Input should be cleared
+  });
+
+  it('displays an error message when input is empty on submit', () => {
+    render(<AddTodoForm onAddTodo={() => {}} />);
+    const button = screen.getByRole('button', { name: /add/i });
+
+    fireEvent.click(button);
+
+    expect(screen.getByText('Todo cannot be empty')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Add a new todo')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByPlaceholderText('Add a new todo')).toHaveAccessibleDescription('Todo cannot be empty');
+  });
+
+  it('displays an error message when input is only whitespace on submit', () => {
+    render(<AddTodoForm onAddTodo={() => {}} />);
+    const input = screen.getByPlaceholderText('Add a new todo');
+    const button = screen.getByRole('button', { name: /add/i });
+
+    fireEvent.change(input, { target: { value: '   ' } });
+    fireEvent.click(button);
+
+    expect(screen.getByText('Todo cannot be empty')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Add a new todo')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByPlaceholderText('Add a new todo')).toHaveAccessibleDescription('Todo cannot be empty');
+  });
+
+  it('hides the error message when user starts typing after an error', () => {
+    render(<AddTodoForm onAddTodo={() => {}} />);
+    const input = screen.getByPlaceholderText('Add a new todo');
+    const button = screen.getByRole('button', { name: /add/i });
+
+    // Trigger error
+    fireEvent.click(button);
+    expect(screen.getByText('Todo cannot be empty')).toBeInTheDocument();
+
+    // Start typing
+    fireEvent.change(input, { target: { value: 'a' } });
+    expect(screen.queryByText('Todo cannot be empty')).not.toBeInTheDocument();
+    expect(input).toHaveAttribute('aria-invalid', 'false');
   });
 });

@@ -9,4 +9,8 @@ export default defineConfig({
     setupFiles: './src/setupTests.ts', // Will create this file
     globals: true,
   },
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+  },
 })
+

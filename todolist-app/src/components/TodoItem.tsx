@@ -14,7 +14,7 @@ interface TodoItemProps {
 const ListItem = styled.li`
   display: flex;
   align-items: center;
-  padding: 10px 0;
+  padding: 15px 10px;
 `;
 
 const Checkbox = styled.input`
@@ -24,6 +24,7 @@ const Checkbox = styled.input`
 
 const TodoText = styled.span<{ $completed: boolean }>`
   flex-grow: 1;
+  text-align: left;
   text-decoration: ${({ $completed }) => ($completed ? 'line-through' : 'none')};
   color: ${({ $completed }) => ($completed ? '#888' : '#333')};
 `;

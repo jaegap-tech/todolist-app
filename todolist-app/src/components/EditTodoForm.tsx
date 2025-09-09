@@ -10,7 +10,8 @@ interface EditTodoFormProps {
 const Form = styled.form`
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
+  width: 100%;
+  align-items: center;
 `;
 
 const Input = styled.input<{ $hasError: boolean }>`

@@ -25,8 +25,12 @@ const Title = styled.h2`
 
 const StyledList = styled.ul`
   padding: 0;
-  li:not(:first-child) { /* Apply border-top to all li except the first one */
-    border-top: 1px solid #eee;
+  list-style: none;
+  li {
+    border-bottom: 1px solid #eee;
+  }
+  li:last-child {
+    border-bottom: none;
   }
 `;
 

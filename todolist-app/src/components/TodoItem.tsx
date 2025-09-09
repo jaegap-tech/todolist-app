@@ -8,7 +8,7 @@ interface TodoItemProps {
   todo: Todo;
   onDelete: (id: number) => void;
   onToggle: (id: number) => void;
-  onUpdate: (id: number, newText: string, newDueDate: string | null) => void;
+  onUpdate: (id: number, newText: string, newDueDate: string | null, newTags: string[]) => void;
 }
 
 const ListItem = styled.li`
@@ -37,6 +37,21 @@ const DueDate = styled.span`
   font-size: 0.8em;
   color: #666;
   margin-top: 4px;
+`;
+
+const TagContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+`;
+
+const Tag = styled.span`
+  background-color: #e0e0e0;
+  color: #555;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7em;
 `;
 
 const ButtonGroup = styled.div`
@@ -69,8 +84,8 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onToggle, onUpdate 
   const [isEditing, setIsEditing] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  const handleSave = (id: number, newText: string, newDueDate: string | null) => {
-    onUpdate(id, newText, newDueDate);
+  const handleSave = (id: number, newText: string, newDueDate: string | null, newTags: string[]) => {
+    onUpdate(id, newText, newDueDate, newTags);
     setIsEditing(false);
   };
 
@@ -104,6 +119,13 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onToggle, onUpdate 
               {todo.text}
             </TodoText>
             {todo.dueDate && <DueDate>Due: {todo.dueDate}</DueDate>}
+            {todo.tags && todo.tags.length > 0 && (
+              <TagContainer>
+                {todo.tags.map((tag, index) => (
+                  <Tag key={index}>{tag}</Tag>
+                ))}
+              </TagContainer>
+            )}
           </TodoTextContainer>
           <ButtonGroup>
             <Button onClick={() => setIsEditing(true)} aria-label={`Edit "${todo.text}"`}>Edit</Button>

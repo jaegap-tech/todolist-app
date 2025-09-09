@@ -21,16 +21,17 @@ vi.mock('./EditTodoForm', () => ({
     <form data-testid="mock-edit-todo-form" onKeyDown={(e) => {if(e.key === 'Escape') onCancel()}}>
       <input type="text" value={todo.text} onChange={() => {}} />
       <input type="date" value={todo.dueDate || ''} onChange={() => {}} />
-      <button onClick={() => onSave(todo.id, 'Updated Text', todo.dueDate)}>Mock Save</button>
+      <input type="text" value={todo.tags.join(', ')} onChange={() => {}} />
+      <button onClick={() => onSave(todo.id, 'Updated Text', todo.dueDate, todo.tags)}>Mock Save</button>
     </form>
   )),
 }));
 
 describe('TodoList', () => {
   const mockTodos: Todo[] = [
-    { id: 1, text: 'Todo 1', completed: false, dueDate: null },
-    { id: 2, text: 'Todo 2', completed: true, dueDate: '2025-12-31' },
-    { id: 3, text: 'Todo 3', completed: false, dueDate: null },
+    { id: 1, text: 'Todo 1', completed: false, dueDate: null, tags: [] },
+    { id: 2, text: 'Todo 2', completed: true, dueDate: '2025-12-31', tags: ['work'] },
+    { id: 3, text: 'Todo 3', completed: false, dueDate: null, tags: [] },
   ];
 
   const mockOnDelete = vi.fn();
@@ -41,7 +42,7 @@ describe('TodoList', () => {
     vi.clearAllMocks();
   });
 
-  it('renders the list of todos with due dates', () => {
+  it('renders the list of todos with due dates and tags', () => {
     render(
       <TodoList
         todos={mockTodos}
@@ -53,6 +54,7 @@ describe('TodoList', () => {
     expect(screen.getByText('Todo 1')).toBeInTheDocument();
     expect(screen.getByText('Todo 2')).toBeInTheDocument();
     expect(screen.getByText('Due: 2025-12-31')).toBeInTheDocument();
+    expect(screen.getByText('work')).toBeInTheDocument();
     expect(screen.getByText('Todo 3')).toBeInTheDocument();
   });
 
@@ -132,6 +134,6 @@ describe('TodoList', () => {
     fireEvent.click(screen.getByText('Mock Save'));
 
     expect(mockOnUpdate).toHaveBeenCalledTimes(1);
-    expect(mockOnUpdate).toHaveBeenCalledWith(mockTodos[0].id, 'Updated Text', mockTodos[0].dueDate);
+    expect(mockOnUpdate).toHaveBeenCalledWith(mockTodos[0].id, 'Updated Text', mockTodos[0].dueDate, mockTodos[0].tags);
   });
 });

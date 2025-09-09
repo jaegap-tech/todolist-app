@@ -9,7 +9,10 @@ function isTodo(obj: any): obj is Todo {
     typeof obj.text === 'string' &&
     typeof obj.completed === 'boolean' &&
     'dueDate' in obj &&
-    (typeof obj.dueDate === 'string' || obj.dueDate === null)
+    (typeof obj.dueDate === 'string' || obj.dueDate === null) &&
+    'tags' in obj && // Check for tags presence
+    Array.isArray(obj.tags) && // Check if tags is an array
+    obj.tags.every((tag: any) => typeof tag === 'string') // Check if all tags are strings
   );
 }
 
@@ -38,11 +41,14 @@ export const loadFromLocalStorage = <T>(key: string): T | undefined => {
 
     // Apply type validation based on the key or expected type
     if (key === 'todos') {
-      // Data migration for older todos without dueDate
+      // Data migration for older todos without dueDate and tags
       if (Array.isArray(parsedValue)) {
         parsedValue.forEach(todo => {
           if (!('dueDate' in todo)) {
             todo.dueDate = null;
+          }
+          if (!('tags' in todo)) {
+            todo.tags = []; // Default to empty array
           }
         });
       }

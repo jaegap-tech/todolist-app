@@ -3,4 +3,5 @@ export interface Todo {
   text: string;
   completed: boolean;
   dueDate: string | null;
+  tags: string[];
 }

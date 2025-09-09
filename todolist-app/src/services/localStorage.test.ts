@@ -7,8 +7,8 @@ describe('localStorage service', () => {
   const MOCK_VALUE = { data: 'testData' };
   const MOCK_TODOS_KEY = 'todos';
   const MOCK_TODOS_VALUE: Todo[] = [
-    { id: 1, text: 'Todo 1', completed: false, dueDate: null },
-    { id: 2, text: 'Todo 2', completed: true, dueDate: '2025-12-31' },
+    { id: 1, text: 'Todo 1', completed: false, dueDate: null, tags: [] },
+    { id: 2, text: 'Todo 2', completed: true, dueDate: '2025-12-31', tags: ['work', 'urgent'] },
   ];
 
   // Mock localStorage
@@ -85,7 +85,7 @@ describe('localStorage service', () => {
   });
 
   it('should return undefined and log warning if todos data is corrupted', () => {
-    localStorageMock.setItem(MOCK_TODOS_KEY, JSON.stringify([{ id: 1, text: 'Todo 1' }])); // Missing completed and dueDate fields
+    localStorageMock.setItem(MOCK_TODOS_KEY, JSON.stringify([{ id: 1, text: 'Todo 1' }])); // Missing completed, dueDate, and tags fields
     const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const loadedValue = loadFromLocalStorage(MOCK_TODOS_KEY);
@@ -104,7 +104,7 @@ describe('localStorage service', () => {
     expect(loadedValue).toEqual(MOCK_TODOS_VALUE);
   });
 
-  it('should migrate old data by adding dueDate', () => {
+  it('should migrate old data by adding dueDate and tags', () => {
     const oldData = [
       { id: 1, text: 'Old Todo 1', completed: false },
     ];
@@ -113,5 +113,6 @@ describe('localStorage service', () => {
     const loadedValue = loadFromLocalStorage<Todo[]>(MOCK_TODOS_KEY);
     expect(loadedValue).toBeDefined();
     expect(loadedValue![0].dueDate).toBe(null);
+    expect(loadedValue![0].tags).toEqual([]);
   });
 });

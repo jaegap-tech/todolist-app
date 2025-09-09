@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 interface AddTodoFormProps {
-  onAddTodo: (text: string, dueDate: string | null) => void;
+  onAddTodo: (text: string, dueDate: string | null, tags: string[]) => void;
 }
 
 const Form = styled.form`
@@ -64,6 +64,7 @@ const VisuallyHiddenLabel = styled.label`
 const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
   const [text, setText] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [tagsInput, setTagsInput] = useState(''); // New state for tags input
   const [hasError, setHasError] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -76,9 +77,12 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
       return;
     }
 
-    onAddTodo(trimmedText, dueDate || null);
+    const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag !== ''); // Parse tags
+
+    onAddTodo(trimmedText, dueDate || null, tags); // Pass tags
     setText('');
     setDueDate('');
+    setTagsInput(''); // Clear tags input
     setHasError(false);
   };
 
@@ -111,6 +115,14 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
           type="date"
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
+        />
+        <VisuallyHiddenLabel htmlFor="tags-input">Tags (comma-separated)</VisuallyHiddenLabel>
+        <Input
+          id="tags-input"
+          type="text"
+          placeholder="Tags (comma-separated)"
+          value={tagsInput}
+          onChange={(e) => setTagsInput(e.target.value)}
         />
       </InputContainer>
       {hasError && <span id="add-todo-error" style={{ color: 'red', fontSize: '0.8em' }}>Todo cannot be empty</span>}

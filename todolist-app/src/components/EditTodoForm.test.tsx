@@ -10,6 +10,7 @@ describe('EditTodoForm', () => {
     text: 'Initial Todo Text',
     completed: false,
     dueDate: null,
+    tags: [],
   };
 
   const mockTodoWithDate: Todo = {
@@ -17,19 +18,22 @@ describe('EditTodoForm', () => {
     text: 'Todo With Date',
     completed: false,
     dueDate: '2025-12-31',
+    tags: ['work', 'personal'],
   };
 
-  it('renders correctly with initial todo text and no due date', () => {
+  it('renders correctly with initial todo text and no due date or tags', () => {
     render(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
     expect(screen.getByDisplayValue('Initial Todo Text')).toBeInTheDocument();
     expect(screen.getByLabelText('Edit due date')).toHaveValue('');
+    expect(screen.getByPlaceholderText('Tags (comma-separated)')).toHaveValue('');
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
   });
 
-  it('renders correctly with initial todo text and a due date', () => {
+  it('renders correctly with initial todo text, a due date, and tags', () => {
     render(<EditTodoForm todo={mockTodoWithDate} onSave={() => {}} onCancel={() => {}} />);
     expect(screen.getByDisplayValue('Todo With Date')).toBeInTheDocument();
     expect(screen.getByLabelText('Edit due date')).toHaveValue('2025-12-31');
+    expect(screen.getByPlaceholderText('Tags (comma-separated)')).toHaveValue('work, personal');
   });
 
   it('calls onSave with the updated values when submitted', () => {
@@ -38,15 +42,18 @@ describe('EditTodoForm', () => {
 
     const input = screen.getByDisplayValue('Initial Todo Text');
     const dateInput = screen.getByLabelText('Edit due date');
+    const tagsInput = screen.getByPlaceholderText('Tags (comma-separated)');
     const button = screen.getByRole('button', { name: /save/i });
     const newDueDate = '2026-01-01';
+    const newTags = 'home, urgent';
 
     fireEvent.change(input, { target: { value: 'Updated Todo Text' } });
     fireEvent.change(dateInput, { target: { value: newDueDate } });
+    fireEvent.change(tagsInput, { target: { value: newTags } });
     fireEvent.click(button);
 
     expect(handleSave).toHaveBeenCalledTimes(1);
-    expect(handleSave).toHaveBeenCalledWith(mockTodo.id, 'Updated Todo Text', newDueDate);
+    expect(handleSave).toHaveBeenCalledWith(mockTodo.id, 'Updated Todo Text', newDueDate, ['home', 'urgent']);
   });
 
   it('does not call onSave if input is empty', () => {

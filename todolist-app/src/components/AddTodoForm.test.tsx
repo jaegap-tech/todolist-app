@@ -8,29 +8,34 @@ describe('AddTodoForm', () => {
     render(<AddTodoForm onAddTodo={() => {}} />);
     expect(screen.getByPlaceholderText('Add a new todo')).toBeInTheDocument();
     expect(screen.getByLabelText('Due Date')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Tags (comma-separated)')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
   });
 
-  it('calls onAddTodo with the input value and due date when submitted', () => {
+  it('calls onAddTodo with the input value, due date, and tags when submitted', () => {
     const handleAddTodo = vi.fn();
     render(<AddTodoForm onAddTodo={handleAddTodo} />);
 
     const input = screen.getByPlaceholderText('Add a new todo');
     const dateInput = screen.getByLabelText('Due Date');
+    const tagsInput = screen.getByPlaceholderText('Tags (comma-separated)');
     const button = screen.getByRole('button', { name: /add/i });
     const dueDate = '2025-12-31';
+    const tags = 'work, personal';
 
     fireEvent.change(input, { target: { value: 'New Test Todo' } });
     fireEvent.change(dateInput, { target: { value: dueDate } });
+    fireEvent.change(tagsInput, { target: { value: tags } });
     fireEvent.click(button);
 
     expect(handleAddTodo).toHaveBeenCalledTimes(1);
-    expect(handleAddTodo).toHaveBeenCalledWith('New Test Todo', dueDate);
+    expect(handleAddTodo).toHaveBeenCalledWith('New Test Todo', dueDate, ['work', 'personal']);
     expect(input).toHaveValue(''); // Input should be cleared
     expect(dateInput).toHaveValue(''); // Date input should be cleared
+    expect(tagsInput).toHaveValue(''); // Tags input should be cleared
   });
 
-  it('calls onAddTodo with null for due date if not provided', () => {
+  it('calls onAddTodo with null for due date and empty array for tags if not provided', () => {
     const handleAddTodo = vi.fn();
     render(<AddTodoForm onAddTodo={handleAddTodo} />);
 
@@ -41,7 +46,7 @@ describe('AddTodoForm', () => {
     fireEvent.click(button);
 
     expect(handleAddTodo).toHaveBeenCalledTimes(1);
-    expect(handleAddTodo).toHaveBeenCalledWith('Another Test Todo', null);
+    expect(handleAddTodo).toHaveBeenCalledWith('Another Test Todo', null, []);
   });
 
   it('does not call onAddTodo if input is empty', () => {

@@ -21,7 +21,8 @@ vi.mock('./EditTodoForm', () => ({
     <form data-testid="mock-edit-todo-form" onKeyDown={(e) => {if(e.key === 'Escape') onCancel()}}>
       <input type="text" value={todo.text} onChange={() => {}} />
       <input type="date" value={todo.dueDate || ''} onChange={() => {}} />
-      <button onClick={() => onSave(todo.id, 'Updated Text', todo.dueDate)}>Mock Save</button>
+      <input type="text" value={todo.tags.join(', ')} onChange={() => {}} />
+      <button onClick={() => onSave(todo.id, 'Updated Text', todo.dueDate, todo.tags)}>Mock Save</button>
     </form>
   )),
 }));
@@ -32,6 +33,7 @@ describe('TodoItem', () => {
     text: 'Test Todo',
     completed: false,
     dueDate: null,
+    tags: [],
   };
 
   const mockTodoWithDate: Todo = {
@@ -39,6 +41,7 @@ describe('TodoItem', () => {
     text: 'Test Todo with Date',
     completed: false,
     dueDate: '2025-12-31',
+    tags: ['work', 'urgent'],
   };
 
   beforeEach(() => {
@@ -82,6 +85,32 @@ describe('TodoItem', () => {
       />
     );
     expect(screen.queryByText(/due:/i)).not.toBeInTheDocument();
+  });
+
+  it('renders tags when they exist', () => {
+    render(
+      <TodoItem
+        todo={mockTodoWithDate}
+        onDelete={() => {}}
+        onToggle={() => {}}
+        onUpdate={() => {}}
+      />
+    );
+    expect(screen.getByText('work')).toBeInTheDocument();
+    expect(screen.getByText('urgent')).toBeInTheDocument();
+  });
+
+  it('does not render tags when they do not exist', () => {
+    render(
+      <TodoItem
+        todo={mockTodo}
+        onDelete={() => {}}
+        onToggle={() => {}}
+        onUpdate={() => {}}
+      />
+    );
+    expect(screen.queryByText(/work/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/urgent/i)).not.toBeInTheDocument();
   });
 
   it('applies line-through style when todo is completed', () => {
@@ -182,6 +211,6 @@ describe('TodoItem', () => {
     fireEvent.click(screen.getByText('Mock Save'));
 
     expect(handleUpdate).toHaveBeenCalledTimes(1);
-    expect(handleUpdate).toHaveBeenCalledWith(mockTodo.id, 'Updated Text', mockTodo.dueDate);
+    expect(handleUpdate).toHaveBeenCalledWith(mockTodo.id, 'Updated Text', mockTodo.dueDate, mockTodo.tags);
   });
 });

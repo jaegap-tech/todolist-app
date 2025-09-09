@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 interface EditTodoFormProps {
   todo: Todo;
-  onSave: (id: number, newText: string, newDueDate: string | null) => void; // Callback for saving
+  onSave: (id: number, newText: string, newDueDate: string | null, newTags: string[]) => void; // Callback for saving
   onCancel: () => void; // Callback for canceling edit
 }
 
@@ -56,6 +56,7 @@ const VisuallyHiddenLabel = styled.label`
 const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave, onCancel }) => {
   const [text, setText] = useState(todo.text);
   const [dueDate, setDueDate] = useState(todo.dueDate || '');
+  const [tagsInput, setTagsInput] = useState(todo.tags.join(', ')); // New state for tags input
   const [hasError, setHasError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -72,8 +73,10 @@ const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave, onCancel }) =
       return;
     }
 
+    const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag !== ''); // Parse tags
+
     setHasError(false);
-    onSave(todo.id, trimmedText, dueDate || null);
+    onSave(todo.id, trimmedText, dueDate || null, tags); // Pass tags
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,6 +112,15 @@ const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave, onCancel }) =
         type="date"
         value={dueDate}
         onChange={(e) => setDueDate(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+      <VisuallyHiddenLabel htmlFor={`edit-tags-input-${todo.id}`}>Tags (comma-separated)</VisuallyHiddenLabel>
+      <Input
+        id={`edit-tags-input-${todo.id}`}
+        type="text"
+        placeholder="Tags (comma-separated)"
+        value={tagsInput}
+        onChange={(e) => setTagsInput(e.target.value)}
         onKeyDown={handleKeyDown}
       />
       {hasError && <span id={`edit-todo-error-${todo.id}`} style={{ color: 'red', fontSize: '0.8em' }}>Todo cannot be empty</span>}

@@ -12,9 +12,15 @@ describe('localStorage service', () => {
   ];
 
   // Mock localStorage
-  const localStorageMock = (() => {
+  let localStorageMock: any; // Declare it outside so it can be reassigned
+
+  Object.defineProperty(window, 'localStorage', {
+    value: localStorageMock, // This will be assigned in beforeEach
+  });
+
+  beforeEach(() => {
     let store: { [key: string]: string } = {};
-    return {
+    localStorageMock = { // Reassign localStorageMock
       getItem: vi.fn((key: string) => store[key] || null),
       setItem: vi.fn((key: string, value: string) => {
         store[key] = value;
@@ -26,15 +32,10 @@ describe('localStorage service', () => {
         store = {};
       }),
     };
-  })();
-
-  Object.defineProperty(window, 'localStorage', {
-    value: localStorageMock,
-  });
-
-  beforeEach(() => {
-    localStorageMock.clear();
-    vi.restoreAllMocks();
+    Object.defineProperty(window, 'localStorage', {
+      value: localStorageMock,
+    });
+    vi.restoreAllMocks(); // This will restore any spies created with spyOn
   });
 
   // saveToLocalStorage tests
@@ -114,5 +115,16 @@ describe('localStorage service', () => {
     expect(loadedValue).toBeDefined();
     expect(loadedValue![0].dueDate).toBe(null);
     expect(loadedValue![0].tags).toEqual([]);
+  });
+
+  it('should save and load theme preference', () => {
+    const themeKey = 'themePreference';
+    const themeValue = 'dark';
+
+    saveToLocalStorage(themeKey, themeValue);
+    expect(localStorageMock.setItem).toHaveBeenCalledWith(themeKey, JSON.stringify(themeValue));
+
+    const loadedTheme = loadFromLocalStorage(themeKey);
+    expect(loadedTheme).toBe(themeValue);
   });
 });

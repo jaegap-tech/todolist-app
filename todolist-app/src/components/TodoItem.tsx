@@ -29,13 +29,13 @@ const TodoTextContainer = styled.div`
 
 const TodoText = styled.span<{ $completed: boolean }>`
   text-decoration: ${({ $completed }) => ($completed ? 'line-through' : 'none')};
-  color: ${({ $completed }) => ($completed ? '#888' : '#333')};
+  color: ${({ $completed, theme }) => ($completed ? theme.completedText : theme.text)}; // Use theme.completedText and theme.text
 `;
 
 const DueDate = styled.span`
   display: block;
   font-size: 0.8em;
-  color: #666;
+  color: ${({ theme }) => theme.secondaryText}; // Use theme.secondaryText
   margin-top: 4px;
 `;
 
@@ -47,8 +47,8 @@ const TagContainer = styled.div`
 `;
 
 const Tag = styled.span`
-  background-color: #e0e0e0;
-  color: #555;
+  background-color: ${({ theme }) => theme.tagBackground}; // Use theme.tagBackground
+  color: ${({ theme }) => theme.tagText}; // Use theme.tagText
   padding: 3px 8px;
   border-radius: 4px;
   font-size: 0.7em;
@@ -69,13 +69,13 @@ const Button = styled.button`
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: #007bff;
+    background-color: ${({ theme }) => theme.primaryHover}; // Use theme.primaryHover
   }
 
   &.delete-button {
-    background-color: #dc3545;
+    background-color: ${({ theme }) => theme.danger}; // Use theme.danger
     &:hover {
-      background-color: #c82333;
+      background-color: ${({ theme }) => theme.dangerHover}; // Use theme.dangerHover
     }
   }
 `;

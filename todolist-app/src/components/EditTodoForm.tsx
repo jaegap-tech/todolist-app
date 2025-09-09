@@ -19,8 +19,10 @@ const Form = styled.form`
 const Input = styled.input<{ $hasError?: boolean }>`
   flex-grow: 1;
   padding: 10px;
-  border: 1px solid ${({ $hasError }) => ($hasError ? 'red' : '#ccc')};
+  border: 1px solid ${({ $hasError, theme }) => ($hasError ? theme.error : theme.border)}; // Use theme.error and theme.border
   border-radius: 4px;
+  background-color: ${({ theme }) => theme.cardBackground}; // Use theme.cardBackground
+  color: ${({ theme }) => theme.text}; // Use theme.text
 `;
 
 const DateInput = styled(Input)`
@@ -30,14 +32,14 @@ const DateInput = styled(Input)`
 
 const Button = styled.button`
   padding: 10px 15px;
-  background-color: #007bff;
+  background-color: ${({ theme }) => theme.primary}; // Use theme.primary
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: ${({ theme }) => theme.primaryHover}; // Use theme.primaryHover
   }
 `;
 
@@ -123,7 +125,7 @@ const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave, onCancel }) =
         onChange={(e) => setTagsInput(e.target.value)}
         onKeyDown={handleKeyDown}
       />
-      {hasError && <span id={`edit-todo-error-${todo.id}`} style={{ color: 'red', fontSize: '0.8em' }}>Todo cannot be empty</span>}
+      {hasError && <span id={`edit-todo-error-${todo.id}`} style={{ color: 'red', fontSize: '0.8em' }}>Todo cannot be empty</span>} {/* Use theme.error for color */}
       <Button type="submit" aria-label={`Save changes for todo ${todo.id}`}>Save</Button>
     </Form>
   );

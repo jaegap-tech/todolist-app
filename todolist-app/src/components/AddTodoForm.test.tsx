@@ -41,10 +41,12 @@ describe('AddTodoForm', () => {
     render(<AddTodoForm onAddTodo={handleAddTodo} />);
 
     const input = screen.getByPlaceholderText('Add a new todo');
-    const button = screen.getByRole('button', { name: /add/i });
+    const form = input.closest('form');
 
     fireEvent.change(input, { target: { value: '   ' } });
-    fireEvent.click(button);
+    if (form) {
+        fireEvent.submit(form);
+    }
 
     expect(handleAddTodo).not.toHaveBeenCalled();
     expect(input).toHaveValue(''); // Input should be cleared
@@ -54,7 +56,11 @@ describe('AddTodoForm', () => {
     render(<AddTodoForm onAddTodo={() => {}} />);
     const button = screen.getByRole('button', { name: /add/i });
 
-    fireEvent.click(button);
+    // The button is disabled, so we need to submit the form directly
+    const form = button.closest('form');
+    if (form) {
+      fireEvent.submit(form);
+    }
 
     expect(screen.getByText('Todo cannot be empty')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Add a new todo')).toHaveAttribute('aria-invalid', 'true');
@@ -67,7 +73,12 @@ describe('AddTodoForm', () => {
     const button = screen.getByRole('button', { name: /add/i });
 
     fireEvent.change(input, { target: { value: '   ' } });
-    fireEvent.click(button);
+
+    // The button is disabled, so we need to submit the form directly
+    const form = button.closest('form');
+    if (form) {
+      fireEvent.submit(form);
+    }
 
     expect(screen.getByText('Todo cannot be empty')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Add a new todo')).toHaveAttribute('aria-invalid', 'true');
@@ -79,13 +90,40 @@ describe('AddTodoForm', () => {
     const input = screen.getByPlaceholderText('Add a new todo');
     const button = screen.getByRole('button', { name: /add/i });
 
-    // Trigger error
-    fireEvent.click(button);
+    // Trigger error by submitting the form
+    const form = button.closest('form');
+    if (form) {
+      fireEvent.submit(form);
+    }
     expect(screen.getByText('Todo cannot be empty')).toBeInTheDocument();
 
     // Start typing
     fireEvent.change(input, { target: { value: 'a' } });
     expect(screen.queryByText('Todo cannot be empty')).not.toBeInTheDocument();
     expect(input).toHaveAttribute('aria-invalid', 'false');
+  });
+
+  it('button is disabled if input is empty', () => {
+    render(<AddTodoForm onAddTodo={() => {}} />);
+    const button = screen.getByRole('button', { name: /add/i });
+    expect(button).toBeDisabled();
+  });
+
+  it('button is enabled when input has text', () => {
+    render(<AddTodoForm onAddTodo={() => {}} />);
+    const input = screen.getByPlaceholderText('Add a new todo');
+    const button = screen.getByRole('button', { name: /add/i });
+
+    fireEvent.change(input, { target: { value: 'New Todo' } });
+    expect(button).toBeEnabled();
+  });
+
+  it('button is disabled if input has only whitespace', () => {
+    render(<AddTodoForm onAddTodo={() => {}} />);
+    const input = screen.getByPlaceholderText('Add a new todo');
+    const button = screen.getByRole('button', { name: /add/i });
+
+    fireEvent.change(input, { target: { value: '   ' } });
+    expect(button).toBeDisabled();
   });
 });

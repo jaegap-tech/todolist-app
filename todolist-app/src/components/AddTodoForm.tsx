@@ -29,6 +29,11 @@ const Button = styled.button`
   &:hover {
     background-color: #0056b3;
   }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 `;
 
 const VisuallyHiddenLabel = styled.label`
@@ -50,15 +55,16 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedText = text.trim();
-    setText('');
 
     if (!trimmedText) {
       setHasError(true);
+      setText(''); // Clear input on invalid submission
       return;
     }
 
-    setHasError(false);
     onAddTodo(trimmedText);
+    setText('');
+    setHasError(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +73,8 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
       setHasError(false);
     }
   };
+
+  const isInputEmpty = text.trim() === '';
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -82,7 +90,7 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
         aria-describedby={hasError ? 'add-todo-error' : undefined}
       />
       {hasError && <span id="add-todo-error" style={{ color: 'red', fontSize: '0.8em' }}>Todo cannot be empty</span>}
-      <Button type="submit" aria-label="Add todo">Add</Button>
+      <Button type="submit" aria-label="Add todo" disabled={isInputEmpty}>Add</Button>
     </Form>
   );
 };

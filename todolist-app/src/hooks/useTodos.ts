@@ -15,19 +15,20 @@ export const useTodos = () => {
     saveToLocalStorage(TODO_STORAGE_KEY, todos);
   }, [todos]);
 
-  const addTodo = (text: string) => {
+  const addTodo = (text: string, dueDate: string | null) => {
     const newTodo: Todo = {
       id: Date.now(), // Simple unique ID
       text,
       completed: false,
+      dueDate,
     };
     setTodos((prevTodos) => [...prevTodos, newTodo]);
   };
 
-  const updateTodo = (id: number, newText: string) => {
+  const updateTodo = (id: number, newText: string, newDueDate: string | null) => {
     setTodos((prevTodos) =>
       prevTodos.map((todo) =>
-        todo.id === id ? { ...todo, text: newText } : todo
+        todo.id === id ? { ...todo, text: newText, dueDate: newDueDate } : todo
       )
     );
   };

@@ -8,7 +8,7 @@ interface TodoItemProps {
   todo: Todo;
   onDelete: (id: number) => void;
   onToggle: (id: number) => void;
-  onUpdate: (id: number, newText: string) => void;
+  onUpdate: (id: number, newText: string, newDueDate: string | null) => void;
 }
 
 const ListItem = styled.li`
@@ -22,11 +22,21 @@ const Checkbox = styled.input`
   transform: scale(1.2);
 `;
 
-const TodoText = styled.span<{ $completed: boolean }>`
+const TodoTextContainer = styled.div`
   flex-grow: 1;
   text-align: left;
+`;
+
+const TodoText = styled.span<{ $completed: boolean }>`
   text-decoration: ${({ $completed }) => ($completed ? 'line-through' : 'none')};
   color: ${({ $completed }) => ($completed ? '#888' : '#333')};
+`;
+
+const DueDate = styled.span`
+  display: block;
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 4px;
 `;
 
 const ButtonGroup = styled.div`
@@ -59,8 +69,8 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onToggle, onUpdate 
   const [isEditing, setIsEditing] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  const handleSave = (id: number, newText: string) => {
-    onUpdate(id, newText);
+  const handleSave = (id: number, newText: string, newDueDate: string | null) => {
+    onUpdate(id, newText, newDueDate);
     setIsEditing(false);
   };
 
@@ -89,9 +99,12 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onToggle, onUpdate 
             onChange={() => onToggle(todo.id)}
             aria-label={`Mark "${todo.text}" as ${todo.completed ? 'incomplete' : 'complete'}`}
           />
-          <TodoText $completed={todo.completed}>
-            {todo.text}
-          </TodoText>
+          <TodoTextContainer>
+            <TodoText $completed={todo.completed}>
+              {todo.text}
+            </TodoText>
+            {todo.dueDate && <DueDate>Due: {todo.dueDate}</DueDate>}
+          </TodoTextContainer>
           <ButtonGroup>
             <Button onClick={() => setIsEditing(true)} aria-label={`Edit "${todo.text}"`}>Edit</Button>
             <Button className="delete-button" onClick={() => setShowConfirmDialog(true)} aria-label={`Delete "${todo.text}"`}>Delete</Button>

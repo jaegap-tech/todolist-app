@@ -17,10 +17,11 @@ vi.mock('./ConfirmationDialog', () => ({
 
 // Mock EditTodoForm to control its behavior
 vi.mock('./EditTodoForm', () => ({
-  default: vi.fn(({ todo, onSave }) => (
-    <form data-testid="mock-edit-todo-form">
+  default: vi.fn(({ todo, onSave, onCancel }) => (
+    <form data-testid="mock-edit-todo-form" onKeyDown={(e) => {if(e.key === 'Escape') onCancel()}}>
       <input type="text" value={todo.text} onChange={() => {}} />
-      <button onClick={() => onSave(todo.id, 'Updated Text')}>Mock Save</button>
+      <input type="date" value={todo.dueDate || ''} onChange={() => {}} />
+      <button onClick={() => onSave(todo.id, 'Updated Text', todo.dueDate)}>Mock Save</button>
     </form>
   )),
 }));
@@ -30,7 +31,19 @@ describe('TodoItem', () => {
     id: 1,
     text: 'Test Todo',
     completed: false,
+    dueDate: null,
   };
+
+  const mockTodoWithDate: Todo = {
+    id: 2,
+    text: 'Test Todo with Date',
+    completed: false,
+    dueDate: '2025-12-31',
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('renders correctly with todo text and checkbox', () => {
     render(
@@ -45,6 +58,30 @@ describe('TodoItem', () => {
     expect(screen.getByRole('checkbox')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
+  });
+
+  it('renders due date when it exists', () => {
+    render(
+      <TodoItem
+        todo={mockTodoWithDate}
+        onDelete={() => {}}
+        onToggle={() => {}}
+        onUpdate={() => {}}
+      />
+    );
+    expect(screen.getByText(`Due: ${mockTodoWithDate.dueDate}`)).toBeInTheDocument();
+  });
+
+  it('does not render due date when it does not exist', () => {
+    render(
+      <TodoItem
+        todo={mockTodo}
+        onDelete={() => {}}
+        onToggle={() => {}}
+        onUpdate={() => {}}
+      />
+    );
+    expect(screen.queryByText(/due:/i)).not.toBeInTheDocument();
   });
 
   it('applies line-through style when todo is completed', () => {
@@ -85,9 +122,8 @@ describe('TodoItem', () => {
       />
     );
     fireEvent.click(screen.getByRole('button', { name: /edit/i }));
-    expect(screen.getByRole('textbox')).toBeInTheDocument(); // Edit form input
-    expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument(); // Edit form save button
-    expect(screen.queryByText('Test Todo')).not.toBeInTheDocument(); // Original text should be hidden
+    expect(screen.getByTestId('mock-edit-todo-form')).toBeInTheDocument();
+    expect(screen.queryByText('Test Todo')).not.toBeInTheDocument();
   });
 
   it('shows ConfirmationDialog when Delete button is clicked', () => {
@@ -100,9 +136,7 @@ describe('TodoItem', () => {
       />
     );
     fireEvent.click(screen.getByRole('button', { name: /delete/i }));
-    expect(screen.getByText(`Are you sure you want to delete "${mockTodo.text}"?`)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /confirm/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+    expect(screen.getByTestId('mock-confirmation-dialog')).toBeInTheDocument();
   });
 
   it('calls onDelete with the correct id when delete is confirmed', async () => {
@@ -118,19 +152,17 @@ describe('TodoItem', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /delete/i }));
 
-    // Wait for the confirmation dialog to appear
     await waitFor(() => {
       expect(screen.getByTestId('mock-confirmation-dialog')).toBeInTheDocument();
     });
 
-    // Click the confirm button in the dialog
     fireEvent.click(screen.getByText('Mock Confirm'));
 
     expect(handleDelete).toHaveBeenCalledTimes(1);
     expect(handleDelete).toHaveBeenCalledWith(mockTodo.id);
   });
 
-  it('calls onUpdate with the correct id and new text when edit is saved', async () => {
+  it('calls onUpdate with the correct values when edit is saved', async () => {
     const handleUpdate = vi.fn();
     render(
       <TodoItem
@@ -143,15 +175,13 @@ describe('TodoItem', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /edit/i }));
 
-    // Wait for the edit form to appear
     await waitFor(() => {
       expect(screen.getByTestId('mock-edit-todo-form')).toBeInTheDocument();
     });
 
-    // Click the save button in the form
     fireEvent.click(screen.getByText('Mock Save'));
 
     expect(handleUpdate).toHaveBeenCalledTimes(1);
-    expect(handleUpdate).toHaveBeenCalledWith(mockTodo.id, 'Updated Text');
+    expect(handleUpdate).toHaveBeenCalledWith(mockTodo.id, 'Updated Text', mockTodo.dueDate);
   });
 });

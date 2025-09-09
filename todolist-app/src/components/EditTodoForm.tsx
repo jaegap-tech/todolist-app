@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 interface EditTodoFormProps {
   todo: Todo;
-  onSave: (id: number, newText: string) => void; // Callback for saving
+  onSave: (id: number, newText: string, newDueDate: string | null) => void; // Callback for saving
   onCancel: () => void; // Callback for canceling edit
 }
 
@@ -13,13 +13,19 @@ const Form = styled.form`
   gap: 10px;
   width: 100%;
   align-items: center;
+  flex-wrap: wrap;
 `;
 
-const Input = styled.input<{ $hasError: boolean }>`
+const Input = styled.input<{ $hasError?: boolean }>`
   flex-grow: 1;
   padding: 10px;
   border: 1px solid ${({ $hasError }) => ($hasError ? 'red' : '#ccc')};
   border-radius: 4px;
+`;
+
+const DateInput = styled(Input)`
+  flex-grow: 0;
+  min-width: 120px;
 `;
 
 const Button = styled.button`
@@ -49,6 +55,7 @@ const VisuallyHiddenLabel = styled.label`
 
 const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave, onCancel }) => {
   const [text, setText] = useState(todo.text);
+  const [dueDate, setDueDate] = useState(todo.dueDate || '');
   const [hasError, setHasError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -66,8 +73,7 @@ const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave, onCancel }) =
     }
 
     setHasError(false);
-    console.log('Updated Todo:', todo.id, trimmedText);
-    onSave(todo.id, trimmedText);
+    onSave(todo.id, trimmedText, dueDate || null);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,6 +102,14 @@ const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave, onCancel }) =
         $hasError={hasError}
         aria-invalid={hasError ? 'true' : 'false'}
         aria-describedby={hasError ? `edit-todo-error-${todo.id}` : undefined}
+      />
+      <VisuallyHiddenLabel htmlFor={`edit-due-date-input-${todo.id}`}>Edit due date</VisuallyHiddenLabel>
+      <DateInput
+        id={`edit-due-date-input-${todo.id}`}
+        type="date"
+        value={dueDate}
+        onChange={(e) => setDueDate(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       {hasError && <span id={`edit-todo-error-${todo.id}`} style={{ color: 'red', fontSize: '0.8em' }}>Todo cannot be empty</span>}
       <Button type="submit" aria-label={`Save changes for todo ${todo.id}`}>Save</Button>

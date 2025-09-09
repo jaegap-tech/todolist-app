@@ -7,22 +7,41 @@ describe('AddTodoForm', () => {
   it('renders correctly', () => {
     render(<AddTodoForm onAddTodo={() => {}} />);
     expect(screen.getByPlaceholderText('Add a new todo')).toBeInTheDocument();
+    expect(screen.getByLabelText('Due Date')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
   });
 
-  it('calls onAddTodo with the input value when submitted', () => {
+  it('calls onAddTodo with the input value and due date when submitted', () => {
+    const handleAddTodo = vi.fn();
+    render(<AddTodoForm onAddTodo={handleAddTodo} />);
+
+    const input = screen.getByPlaceholderText('Add a new todo');
+    const dateInput = screen.getByLabelText('Due Date');
+    const button = screen.getByRole('button', { name: /add/i });
+    const dueDate = '2025-12-31';
+
+    fireEvent.change(input, { target: { value: 'New Test Todo' } });
+    fireEvent.change(dateInput, { target: { value: dueDate } });
+    fireEvent.click(button);
+
+    expect(handleAddTodo).toHaveBeenCalledTimes(1);
+    expect(handleAddTodo).toHaveBeenCalledWith('New Test Todo', dueDate);
+    expect(input).toHaveValue(''); // Input should be cleared
+    expect(dateInput).toHaveValue(''); // Date input should be cleared
+  });
+
+  it('calls onAddTodo with null for due date if not provided', () => {
     const handleAddTodo = vi.fn();
     render(<AddTodoForm onAddTodo={handleAddTodo} />);
 
     const input = screen.getByPlaceholderText('Add a new todo');
     const button = screen.getByRole('button', { name: /add/i });
 
-    fireEvent.change(input, { target: { value: 'New Test Todo' } });
+    fireEvent.change(input, { target: { value: 'Another Test Todo' } });
     fireEvent.click(button);
 
     expect(handleAddTodo).toHaveBeenCalledTimes(1);
-    expect(handleAddTodo).toHaveBeenCalledWith('New Test Todo');
-    expect(input).toHaveValue(''); // Input should be cleared
+    expect(handleAddTodo).toHaveBeenCalledWith('Another Test Todo', null);
   });
 
   it('does not call onAddTodo if input is empty', () => {

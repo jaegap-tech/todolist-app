@@ -1,9 +1,9 @@
-import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useTodos } from './useTodos';
 import { loadFromLocalStorage, saveToLocalStorage } from '../services/localStorage';
 import { DUMMY_TODOS } from '../data/todos';
 import { vi } from 'vitest';
+import type { Todo } from '../types/todo';
 
 // Mock localStorage functions
 vi.mock('../services/localStorage', () => ({
@@ -13,7 +13,7 @@ vi.mock('../services/localStorage', () => ({
 
 // Mock DUMMY_TODOS to control initial state
 vi.mock('../data/todos', () => ({
-  DUMMY_TODOS: [{ id: 99, text: 'Dummy Todo', completed: false }],
+  DUMMY_TODOS: [{ id: 99, text: 'Dummy Todo', completed: false, dueDate: null }],
 }));
 
 describe('useTodos', () => {
@@ -24,7 +24,7 @@ describe('useTodos', () => {
   });
 
   it('loads todos from local storage on initial render', () => {
-    const storedData = [{ id: 1, text: 'Stored Todo', completed: false }];
+    const storedData: Todo[] = [{ id: 1, text: 'Stored Todo', completed: false, dueDate: null }];
     (loadFromLocalStorage as vi.Mock).mockReturnValue(storedData);
 
     const { result } = renderHook(() => useTodos());
@@ -42,33 +42,37 @@ describe('useTodos', () => {
     expect(result.current.todos).toEqual(DUMMY_TODOS);
   });
 
-  it('adds a new todo', () => {
+  it('adds a new todo with a due date', () => {
     (loadFromLocalStorage as vi.Mock).mockReturnValue([]);
     const { result } = renderHook(() => useTodos());
+    const dueDate = '2025-12-31';
 
     act(() => {
-      result.current.addTodo('New Todo');
+      result.current.addTodo('New Todo', dueDate);
     });
 
     expect(result.current.todos.length).toBe(1);
     expect(result.current.todos[0].text).toBe('New Todo');
     expect(result.current.todos[0].completed).toBe(false);
+    expect(result.current.todos[0].dueDate).toBe(dueDate);
   });
 
-  it('updates an existing todo', () => {
-    const initialTodos = [{ id: 1, text: 'Original Todo', completed: false }];
+  it('updates an existing todo with a new due date', () => {
+    const initialTodos: Todo[] = [{ id: 1, text: 'Original Todo', completed: false, dueDate: null }];
     (loadFromLocalStorage as vi.Mock).mockReturnValue(initialTodos);
     const { result } = renderHook(() => useTodos());
+    const newDueDate = '2026-01-15';
 
     act(() => {
-      result.current.updateTodo(1, 'Updated Todo');
+      result.current.updateTodo(1, 'Updated Todo', newDueDate);
     });
 
     expect(result.current.todos[0].text).toBe('Updated Todo');
+    expect(result.current.todos[0].dueDate).toBe(newDueDate);
   });
 
   it('deletes a todo', () => {
-    const initialTodos = [{ id: 1, text: 'Todo to delete', completed: false }];
+    const initialTodos: Todo[] = [{ id: 1, text: 'Todo to delete', completed: false, dueDate: null }];
     (loadFromLocalStorage as vi.Mock).mockReturnValue(initialTodos);
     const { result } = renderHook(() => useTodos());
 
@@ -80,7 +84,7 @@ describe('useTodos', () => {
   });
 
   it('toggles todo completed status', () => {
-    const initialTodos = [{ id: 1, text: 'Toggle Todo', completed: false }];
+    const initialTodos: Todo[] = [{ id: 1, text: 'Toggle Todo', completed: false, dueDate: null }];
     (loadFromLocalStorage as vi.Mock).mockReturnValue(initialTodos);
     const { result } = renderHook(() => useTodos());
 
@@ -104,7 +108,7 @@ describe('useTodos', () => {
     expect(saveToLocalStorage).toHaveBeenCalledTimes(1); // Initial save
 
     act(() => {
-      result.current.addTodo('Another Todo');
+      result.current.addTodo('Another Todo', null);
     });
 
     expect(saveToLocalStorage).toHaveBeenCalledTimes(2); // After adding todo

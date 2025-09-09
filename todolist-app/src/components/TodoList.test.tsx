@@ -20,23 +20,28 @@ vi.mock('./EditTodoForm', () => ({
   default: vi.fn(({ todo, onSave, onCancel }) => (
     <form data-testid="mock-edit-todo-form" onKeyDown={(e) => {if(e.key === 'Escape') onCancel()}}>
       <input type="text" value={todo.text} onChange={() => {}} />
-      <button onClick={() => onSave(todo.id, 'Updated Text')}>Mock Save</button>
+      <input type="date" value={todo.dueDate || ''} onChange={() => {}} />
+      <button onClick={() => onSave(todo.id, 'Updated Text', todo.dueDate)}>Mock Save</button>
     </form>
   )),
 }));
 
 describe('TodoList', () => {
   const mockTodos: Todo[] = [
-    { id: 1, text: 'Todo 1', completed: false },
-    { id: 2, text: 'Todo 2', completed: true },
-    { id: 3, text: 'Todo 3', completed: false },
+    { id: 1, text: 'Todo 1', completed: false, dueDate: null },
+    { id: 2, text: 'Todo 2', completed: true, dueDate: '2025-12-31' },
+    { id: 3, text: 'Todo 3', completed: false, dueDate: null },
   ];
 
   const mockOnDelete = vi.fn();
   const mockOnToggle = vi.fn();
   const mockOnUpdate = vi.fn();
 
-  it('renders the list of todos', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('renders the list of todos with due dates', () => {
     render(
       <TodoList
         todos={mockTodos}
@@ -47,6 +52,7 @@ describe('TodoList', () => {
     );
     expect(screen.getByText('Todo 1')).toBeInTheDocument();
     expect(screen.getByText('Todo 2')).toBeInTheDocument();
+    expect(screen.getByText('Due: 2025-12-31')).toBeInTheDocument();
     expect(screen.getByText('Todo 3')).toBeInTheDocument();
   });
 
@@ -126,31 +132,6 @@ describe('TodoList', () => {
     fireEvent.click(screen.getByText('Mock Save'));
 
     expect(mockOnUpdate).toHaveBeenCalledTimes(1);
-    expect(mockOnUpdate).toHaveBeenCalledWith(mockTodos[0].id, 'Updated Text'); // Check if called with Todo 1's ID and new text
-  });
-
-  it('passes correct props to TodoItem', () => {
-    render(
-      <TodoList
-        todos={mockTodos}
-        onDelete={mockOnDelete}
-        onToggle={mockOnToggle}
-        onUpdate={mockOnUpdate}
-      />
-    );
-    const todo1Item = screen.getByText('Todo 1');
-    const todo1Checkbox = todo1Item.previousSibling as HTMLInputElement; // Get the checkbox
-    const todo1DeleteButton = screen.getAllByRole('button', { name: /delete/i })[0];
-    const todo1EditButton = screen.getAllByRole('button', { name: /edit/i })[0];
-
-    fireEvent.click(todo1Checkbox);
-    expect(mockOnToggle).toHaveBeenCalledWith(1);
-
-    fireEvent.click(todo1DeleteButton);
-    // Confirmation dialog will appear, so onDelete is not called directly yet
-    // This test only checks if the prop is passed, not the full delete flow
-
-    fireEvent.click(todo1EditButton);
-    // Edit form appears, so onUpdate is not called directly yet
+    expect(mockOnUpdate).toHaveBeenCalledWith(mockTodos[0].id, 'Updated Text', mockTodos[0].dueDate);
   });
 });

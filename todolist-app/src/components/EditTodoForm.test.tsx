@@ -9,26 +9,44 @@ describe('EditTodoForm', () => {
     id: 1,
     text: 'Initial Todo Text',
     completed: false,
+    dueDate: null,
   };
 
-  it('renders correctly with initial todo text', () => {
+  const mockTodoWithDate: Todo = {
+    id: 2,
+    text: 'Todo With Date',
+    completed: false,
+    dueDate: '2025-12-31',
+  };
+
+  it('renders correctly with initial todo text and no due date', () => {
     render(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
     expect(screen.getByDisplayValue('Initial Todo Text')).toBeInTheDocument();
+    expect(screen.getByLabelText('Edit due date')).toHaveValue('');
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
   });
 
-  it('calls onSave with the updated value when submitted', () => {
+  it('renders correctly with initial todo text and a due date', () => {
+    render(<EditTodoForm todo={mockTodoWithDate} onSave={() => {}} onCancel={() => {}} />);
+    expect(screen.getByDisplayValue('Todo With Date')).toBeInTheDocument();
+    expect(screen.getByLabelText('Edit due date')).toHaveValue('2025-12-31');
+  });
+
+  it('calls onSave with the updated values when submitted', () => {
     const handleSave = vi.fn();
     render(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={() => {}} />);
 
     const input = screen.getByDisplayValue('Initial Todo Text');
+    const dateInput = screen.getByLabelText('Edit due date');
     const button = screen.getByRole('button', { name: /save/i });
+    const newDueDate = '2026-01-01';
 
     fireEvent.change(input, { target: { value: 'Updated Todo Text' } });
+    fireEvent.change(dateInput, { target: { value: newDueDate } });
     fireEvent.click(button);
 
     expect(handleSave).toHaveBeenCalledTimes(1);
-    expect(handleSave).toHaveBeenCalledWith(mockTodo.id, 'Updated Todo Text');
+    expect(handleSave).toHaveBeenCalledWith(mockTodo.id, 'Updated Todo Text', newDueDate);
   });
 
   it('does not call onSave if input is empty', () => {

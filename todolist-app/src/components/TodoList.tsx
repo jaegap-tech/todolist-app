@@ -7,7 +7,7 @@ interface TodoListProps {
   todos: Todo[];
   onDelete: (id: number) => void;
   onToggle: (id: number) => void;
-  onUpdate: (id: number, newText: string) => void;
+  onUpdate: (id: number, newText: string, newDueDate: string | null) => void;
 }
 
 const ListContainer = styled.div`

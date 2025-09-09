@@ -17,8 +17,8 @@ vi.mock('./ConfirmationDialog', () => ({
 
 // Mock EditTodoForm to control its behavior
 vi.mock('./EditTodoForm', () => ({
-  default: vi.fn(({ todo, onSave }) => (
-    <form data-testid="mock-edit-todo-form">
+  default: vi.fn(({ todo, onSave, onCancel }) => (
+    <form data-testid="mock-edit-todo-form" onKeyDown={(e) => {if(e.key === 'Escape') onCancel()}}>
       <input type="text" value={todo.text} onChange={() => {}} />
       <button onClick={() => onSave(todo.id, 'Updated Text')}>Mock Save</button>
     </form>
@@ -50,7 +50,7 @@ describe('TodoList', () => {
     expect(screen.getByText('Todo 3')).toBeInTheDocument();
   });
 
-  it('renders correctly with an empty list', () => {
+  it('renders empty state message when there are no todos', () => {
     render(
       <TodoList
         todos={[]}
@@ -59,8 +59,8 @@ describe('TodoList', () => {
         onUpdate={mockOnUpdate}
       />
     );
+    expect(screen.getByText('할 일을 추가해보세요')).toBeInTheDocument();
     expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
-    expect(screen.getByText('Todo List')).toBeInTheDocument(); // Check if title is still there
   });
 
   it('sorts completed todos to the bottom', () => {

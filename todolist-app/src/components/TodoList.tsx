@@ -34,6 +34,12 @@ const StyledList = styled.ul`
   }
 `;
 
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 40px 20px;
+  color: #888;
+`;
+
 const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onToggle, onUpdate }) => {
   // Create a mutable copy for sorting
   const sortedTodos = [...todos].sort((a, b) => {
@@ -49,11 +55,15 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onToggle, onUpdate
   return (
     <ListContainer>
       <Title>Todo List</Title>
-      <StyledList>
-        {sortedTodos.map(todo => (
-          <TodoItem key={todo.id} todo={todo} onDelete={onDelete} onToggle={onToggle} onUpdate={onUpdate} />
-        ))}
-      </StyledList>
+      {todos.length === 0 ? (
+        <EmptyState>할 일을 추가해보세요</EmptyState>
+      ) : (
+        <StyledList>
+          {sortedTodos.map(todo => (
+            <TodoItem key={todo.id} todo={todo} onDelete={onDelete} onToggle={onToggle} onUpdate={onUpdate} />
+          ))}
+        </StyledList>
+      )}
     </ListContainer>
   );
 };

@@ -5,6 +5,7 @@ import styled from 'styled-components';
 interface EditTodoFormProps {
   todo: Todo;
   onSave: (id: number, newText: string) => void; // Callback for saving
+  onCancel: () => void; // Callback for canceling edit
 }
 
 const Form = styled.form`
@@ -46,7 +47,7 @@ const VisuallyHiddenLabel = styled.label`
   border: 0;
 `;
 
-const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave }) => {
+const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave, onCancel }) => {
   const [text, setText] = useState(todo.text);
   const [hasError, setHasError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -76,6 +77,12 @@ const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave }) => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onCancel();
+    }
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
       <VisuallyHiddenLabel htmlFor={`edit-todo-input-${todo.id}`}>Edit todo text</VisuallyHiddenLabel>
@@ -85,6 +92,7 @@ const EditTodoForm: React.FC<EditTodoFormProps> = ({ todo, onSave }) => {
         type="text"
         value={text}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
         $hasError={hasError}
         aria-invalid={hasError ? 'true' : 'false'}
         aria-describedby={hasError ? `edit-todo-error-${todo.id}` : undefined}

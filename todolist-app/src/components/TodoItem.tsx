@@ -64,6 +64,10 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onToggle, onUpdate 
     setIsEditing(false);
   };
 
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
   const handleConfirmDelete = () => {
     onDelete(todo.id);
     setShowConfirmDialog(false);
@@ -76,7 +80,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onToggle, onUpdate 
   return (
     <ListItem>
       {isEditing ? (
-        <EditTodoForm todo={todo} onSave={handleSave} />
+        <EditTodoForm todo={todo} onSave={handleSave} onCancel={handleCancelEdit} />
       ) : (
         <>
           <Checkbox

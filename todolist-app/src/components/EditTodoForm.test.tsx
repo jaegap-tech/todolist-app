@@ -12,14 +12,14 @@ describe('EditTodoForm', () => {
   };
 
   it('renders correctly with initial todo text', () => {
-    render(<EditTodoForm todo={mockTodo} onSave={() => {}} />);
+    render(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
     expect(screen.getByDisplayValue('Initial Todo Text')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
   });
 
   it('calls onSave with the updated value when submitted', () => {
     const handleSave = vi.fn();
-    render(<EditTodoForm todo={mockTodo} onSave={handleSave} />);
+    render(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={() => {}} />);
 
     const input = screen.getByDisplayValue('Initial Todo Text');
     const button = screen.getByRole('button', { name: /save/i });
@@ -33,7 +33,7 @@ describe('EditTodoForm', () => {
 
   it('does not call onSave if input is empty', () => {
     const handleSave = vi.fn();
-    render(<EditTodoForm todo={mockTodo} onSave={handleSave} />);
+    render(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={() => {}} />);
 
     const input = screen.getByDisplayValue('Initial Todo Text');
     const button = screen.getByRole('button', { name: /save/i });
@@ -46,7 +46,7 @@ describe('EditTodoForm', () => {
 
   it('does not call onSave if input is only whitespace', () => {
     const handleSave = vi.fn();
-    render(<EditTodoForm todo={mockTodo} onSave={handleSave} />);
+    render(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={() => {}} />);
 
     const input = screen.getByDisplayValue('Initial Todo Text');
     const button = screen.getByRole('button', { name: /save/i });
@@ -58,7 +58,7 @@ describe('EditTodoForm', () => {
   });
 
   it('displays an error message when input is empty on submit', () => {
-    render(<EditTodoForm todo={mockTodo} onSave={() => {}} />);
+    render(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
     const input = screen.getByDisplayValue('Initial Todo Text');
     const button = screen.getByRole('button', { name: /save/i });
 
@@ -71,7 +71,7 @@ describe('EditTodoForm', () => {
   });
 
   it('displays an error message when input is only whitespace on submit', () => {
-    render(<EditTodoForm todo={mockTodo} onSave={() => {}} />);
+    render(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
     const input = screen.getByDisplayValue('Initial Todo Text');
     const button = screen.getByRole('button', { name: /save/i });
 
@@ -84,7 +84,7 @@ describe('EditTodoForm', () => {
   });
 
   it('hides the error message when user starts typing after an error', () => {
-    render(<EditTodoForm todo={mockTodo} onSave={() => {}} />);
+    render(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
     const input = screen.getByDisplayValue('Initial Todo Text');
     const button = screen.getByRole('button', { name: /save/i });
 
@@ -97,5 +97,18 @@ describe('EditTodoForm', () => {
     fireEvent.change(input, { target: { value: 'a' } });
     expect(screen.queryByText('Todo cannot be empty')).not.toBeInTheDocument();
     expect(input).toHaveAttribute('aria-invalid', 'false');
+  });
+
+  it('calls onCancel when Escape key is pressed', () => {
+    const handleSave = vi.fn();
+    const handleCancel = vi.fn();
+    render(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={handleCancel} />);
+
+    const input = screen.getByDisplayValue('Initial Todo Text');
+
+    fireEvent.keyDown(input, { key: 'Escape', code: 'Escape' });
+
+    expect(handleCancel).toHaveBeenCalledTimes(1);
+    expect(handleSave).not.toHaveBeenCalled();
   });
 });

@@ -13,10 +13,18 @@ const AppContainer = styled.div`
   padding: 20px;
 `;
 
+const HeaderContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+
+const Title = styled.h1`
+  margin-bottom: 0;
+`;
+
 const ThemeToggleButton = styled.button`
-  position: absolute;
-  top: 20px;
-  right: 20px;
   padding: 10px 15px;
   background-color: ${({ theme }) => theme.primary};
   color: white;
@@ -38,10 +46,12 @@ function AppContent() { // Renamed App to AppContent to use useTheme hook
 
   return (
     <AppContainer>
-      <ThemeToggleButton onClick={handleToggleTheme}>
-        Switch to {themeName === 'light' ? 'Dark' : 'Light'} Mode
-      </ThemeToggleButton>
-      <h1>Todo App</h1>
+      <HeaderContainer>
+        <Title>Todo App</Title>
+        <ThemeToggleButton onClick={handleToggleTheme}>
+          Switch to {themeName === 'light' ? 'Dark' : 'Light'} Mode
+        </ThemeToggleButton>
+      </HeaderContainer>
       <AddTodoForm onAddTodo={addTodo} /> {/* Pass addTodo as a prop */}
       <TodoList todos={todos} onDelete={deleteTodo} onToggle={toggleTodo} onUpdate={updateTodo} /> {/* Pass todos, deleteTodo, toggleTodo, and updateTodo as props */}
     </AppContainer>

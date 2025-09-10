@@ -7,20 +7,16 @@ describe('localStorage service', () => {
   const MOCK_VALUE = { data: 'testData' };
   const MOCK_TODOS_KEY = 'todos';
   const MOCK_TODOS_VALUE: Todo[] = [
-    { id: 1, text: 'Todo 1', completed: false, dueDate: null, tags: [] },
-    { id: 2, text: 'Todo 2', completed: true, dueDate: '2025-12-31', tags: ['work', 'urgent'] },
+    { id: 1, text: 'Todo 1', status: 'todo', dueDate: null, tags: [] },
+    { id: 2, text: 'Todo 2', status: 'done', dueDate: '2025-12-31', tags: ['work', 'urgent'] },
   ];
 
   // Mock localStorage
-  let localStorageMock: any; // Declare it outside so it can be reassigned
-
-  Object.defineProperty(window, 'localStorage', {
-    value: localStorageMock, // This will be assigned in beforeEach
-  });
+  let localStorageMock: any;
 
   beforeEach(() => {
     let store: { [key: string]: string } = {};
-    localStorageMock = { // Reassign localStorageMock
+    localStorageMock = {
       getItem: vi.fn((key: string) => store[key] || null),
       setItem: vi.fn((key: string, value: string) => {
         store[key] = value;
@@ -34,8 +30,9 @@ describe('localStorage service', () => {
     };
     Object.defineProperty(window, 'localStorage', {
       value: localStorageMock,
+      writable: true,
     });
-    vi.restoreAllMocks(); // This will restore any spies created with spyOn
+    vi.restoreAllMocks();
   });
 
   // saveToLocalStorage tests
@@ -86,7 +83,7 @@ describe('localStorage service', () => {
   });
 
   it('should return undefined and log warning if todos data is corrupted', () => {
-    localStorageMock.setItem(MOCK_TODOS_KEY, JSON.stringify([{ id: 1, text: 'Todo 1' }])); // Missing completed, dueDate, and tags fields
+    localStorageMock.setItem(MOCK_TODOS_KEY, JSON.stringify([{ id: 1, text: 'Todo 1' }])); // Missing status, dueDate, and tags fields
     const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const loadedValue = loadFromLocalStorage(MOCK_TODOS_KEY);
@@ -115,6 +112,20 @@ describe('localStorage service', () => {
     expect(loadedValue).toBeDefined();
     expect(loadedValue![0].dueDate).toBe(null);
     expect(loadedValue![0].tags).toEqual([]);
+  });
+
+  it('should migrate old data from completed to status', () => {
+    const oldData = [
+      { id: 1, text: 'Old Todo 1', completed: false, dueDate: null, tags: [] },
+      { id: 2, text: 'Old Todo 2', completed: true, dueDate: null, tags: [] },
+    ];
+    localStorageMock.setItem(MOCK_TODOS_KEY, JSON.stringify(oldData));
+
+    const loadedValue = loadFromLocalStorage<Todo[]>(MOCK_TODOS_KEY);
+    expect(loadedValue).toBeDefined();
+    expect(loadedValue![0].status).toBe('todo');
+    expect(loadedValue![1].status).toBe('done');
+    expect(loadedValue![0]).not.toHaveProperty('completed');
   });
 
   it('should save and load theme preference', () => {

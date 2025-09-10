@@ -37,7 +37,7 @@ const ThemeToggleButton = styled.button`
 `;
 
 function AppContent() { // Renamed App to AppContent to use useTheme hook
-  const { todos, addTodo, deleteTodo, toggleTodo, updateTodo } = useTodos(); // Use the custom hook
+  const { todos, addTodo, deleteTodo, updateTodoStatus, updateTodo } = useTodos(); // Use the custom hook
   const { themeName, setTheme } = useTheme(); // Use the useTheme hook
 
   const handleToggleTheme = () => {
@@ -53,7 +53,7 @@ function AppContent() { // Renamed App to AppContent to use useTheme hook
         </ThemeToggleButton>
       </HeaderContainer>
       <AddTodoForm onAddTodo={addTodo} /> {/* Pass addTodo as a prop */}
-      <TodoList todos={todos} onDelete={deleteTodo} onToggle={toggleTodo} onUpdate={updateTodo} /> {/* Pass todos, deleteTodo, toggleTodo, and updateTodo as props */}
+      <TodoList todos={todos} onDelete={deleteTodo} onUpdateStatus={updateTodoStatus} onUpdate={updateTodo} /> {/* Pass todos, deleteTodo, updateTodoStatus, and updateTodo as props */}
     </AppContainer>
   );
 }

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 interface TodoListProps {
   todos: Todo[];
   onDelete: (id: number) => void;
-  onToggle: (id: number) => void;
+  onUpdateStatus: (id: number, status: 'todo' | 'inProgress' | 'blocked' | 'done') => void;
   onUpdate: (id: number, newText: string, newDueDate: string | null, newTags: string[]) => void;
 }
 
@@ -40,16 +40,17 @@ const EmptyState = styled.div`
   color: ${({ theme }) => theme.emptyState}; // Use theme.emptyState
 `;
 
-const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onToggle, onUpdate }) => {
+const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onUpdateStatus, onUpdate }) => {
+  const statusOrder: Record<'todo' | 'inProgress' | 'blocked' | 'done', number> = {
+    inProgress: 1,
+    todo: 2,
+    blocked: 3,
+    done: 4,
+  };
+
   // Create a mutable copy for sorting
   const sortedTodos = [...todos].sort((a, b) => {
-    if (a.completed && !b.completed) {
-      return 1;
-    }
-    if (!a.completed && b.completed) {
-      return -1;
-    }
-    return 0;
+    return statusOrder[a.status] - statusOrder[b.status];
   });
 
   return (
@@ -60,7 +61,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onToggle, onUpdate
       ) : (
         <StyledList>
           {sortedTodos.map(todo => (
-            <TodoItem key={todo.id} todo={todo} onDelete={onDelete} onToggle={onToggle} onUpdate={onUpdate} />
+            <TodoItem key={todo.id} todo={todo} onDelete={onDelete} onUpdateStatus={onUpdateStatus} onUpdate={onUpdate} />
           ))}
         </StyledList>
       )}
@@ -69,3 +70,4 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onToggle, onUpdate
 };
 
 export default TodoList;
+

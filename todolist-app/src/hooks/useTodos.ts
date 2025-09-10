@@ -19,7 +19,7 @@ export const useTodos = () => {
     const newTodo: Todo = {
       id: Date.now(), // Simple unique ID
       text,
-      completed: false,
+      status: 'todo',
       dueDate,
       tags,
     };
@@ -38,10 +38,10 @@ export const useTodos = () => {
     setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
   };
 
-  const toggleTodo = (id: number) => {
+  const updateTodoStatus = (id: number, status: 'todo' | 'inProgress' | 'blocked' | 'done') => {
     setTodos((prevTodos) =>
       prevTodos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        todo.id === id ? { ...todo, status } : todo
       )
     );
   };
@@ -51,6 +51,6 @@ export const useTodos = () => {
     addTodo,
     updateTodo,
     deleteTodo,
-    toggleTodo,
+    updateTodoStatus,
   };
 };

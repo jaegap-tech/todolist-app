@@ -13,7 +13,7 @@ vi.mock('../services/localStorage', () => ({
 
 // Mock DUMMY_TODOS to control initial state
 vi.mock('../data/todos', () => ({
-  DUMMY_TODOS: [{ id: 99, text: 'Dummy Todo', completed: false, dueDate: null, tags: [] }],
+  DUMMY_TODOS: [{ id: 99, text: 'Dummy Todo', status: 'todo', dueDate: null, tags: [] }],
 }));
 
 describe('useTodos', () => {
@@ -24,7 +24,7 @@ describe('useTodos', () => {
   });
 
   it('loads todos from local storage on initial render', () => {
-    const storedData: Todo[] = [{ id: 1, text: 'Stored Todo', completed: false, dueDate: null, tags: [] }];
+    const storedData: Todo[] = [{ id: 1, text: 'Stored Todo', status: 'todo', dueDate: null, tags: [] }];
     (loadFromLocalStorage as vi.Mock).mockReturnValue(storedData);
 
     const { result } = renderHook(() => useTodos());
@@ -54,13 +54,13 @@ describe('useTodos', () => {
 
     expect(result.current.todos.length).toBe(1);
     expect(result.current.todos[0].text).toBe('New Todo');
-    expect(result.current.todos[0].completed).toBe(false);
+    expect(result.current.todos[0].status).toBe('todo');
     expect(result.current.todos[0].dueDate).toBe(dueDate);
     expect(result.current.todos[0].tags).toEqual(tags);
   });
 
   it('updates an existing todo with a new due date and tags', () => {
-    const initialTodos: Todo[] = [{ id: 1, text: 'Original Todo', completed: false, dueDate: null, tags: [] }];
+    const initialTodos: Todo[] = [{ id: 1, text: 'Original Todo', status: 'todo', dueDate: null, tags: [] }];
     (loadFromLocalStorage as vi.Mock).mockReturnValue(initialTodos);
     const { result } = renderHook(() => useTodos());
     const newDueDate = '2026-01-15';
@@ -76,7 +76,7 @@ describe('useTodos', () => {
   });
 
   it('deletes a todo', () => {
-    const initialTodos: Todo[] = [{ id: 1, text: 'Todo to delete', completed: false, dueDate: null, tags: [] }];
+    const initialTodos: Todo[] = [{ id: 1, text: 'Todo to delete', status: 'todo', dueDate: null, tags: [] }];
     (loadFromLocalStorage as vi.Mock).mockReturnValue(initialTodos);
     const { result } = renderHook(() => useTodos());
 
@@ -87,22 +87,22 @@ describe('useTodos', () => {
     expect(result.current.todos.length).toBe(0);
   });
 
-  it('toggles todo completed status', () => {
-    const initialTodos: Todo[] = [{ id: 1, text: 'Toggle Todo', completed: false, dueDate: null, tags: [] }];
+  it('updates a todo status', () => {
+    const initialTodos: Todo[] = [{ id: 1, text: 'Status Todo', status: 'todo', dueDate: null, tags: [] }];
     (loadFromLocalStorage as vi.Mock).mockReturnValue(initialTodos);
     const { result } = renderHook(() => useTodos());
 
     act(() => {
-      result.current.toggleTodo(1);
+      result.current.updateTodoStatus(1, 'inProgress');
     });
 
-    expect(result.current.todos[0].completed).toBe(true);
+    expect(result.current.todos[0].status).toBe('inProgress');
 
     act(() => {
-      result.current.toggleTodo(1);
+      result.current.updateTodoStatus(1, 'done');
     });
 
-    expect(result.current.todos[0].completed).toBe(false);
+    expect(result.current.todos[0].status).toBe('done');
   });
 
   it('saves todos to local storage when todos change', () => {

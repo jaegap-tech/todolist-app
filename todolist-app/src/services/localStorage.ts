@@ -2,17 +2,27 @@ import type { Todo } from '../types/todo';
 
 // Type guard for Todo
 function isTodo(obj: any): obj is Todo {
+  // Data migration from `completed` to `status`
+  if (typeof obj.completed === 'boolean') {
+    obj.status = obj.completed ? 'done' : 'todo';
+    delete obj.completed;
+  }
+
+  const validStatus = ['todo', 'inProgress', 'blocked', 'done'];
+
   return (
     typeof obj === 'object' &&
     obj !== null &&
     typeof obj.id === 'number' &&
     typeof obj.text === 'string' &&
-    typeof obj.completed === 'boolean' &&
+    'status' in obj &&
+    typeof obj.status === 'string' &&
+    validStatus.includes(obj.status) &&
     'dueDate' in obj &&
     (typeof obj.dueDate === 'string' || obj.dueDate === null) &&
-    'tags' in obj && // Check for tags presence
-    Array.isArray(obj.tags) && // Check if tags is an array
-    obj.tags.every((tag: any) => typeof tag === 'string') // Check if all tags are strings
+    'tags' in obj &&
+    Array.isArray(obj.tags) &&
+    obj.tags.every((tag: any) => typeof tag === 'string')
   );
 }
 

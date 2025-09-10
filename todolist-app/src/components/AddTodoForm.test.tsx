@@ -2,10 +2,15 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import AddTodoForm from './AddTodoForm';
 import { describe, it, expect, vi } from 'vitest';
+import { ThemeProvider } from '../contexts/ThemeContext'; // Import ThemeProvider
+
+const renderWithTheme = (component: React.ReactElement) => {
+  return render(<ThemeProvider>{component}</ThemeProvider>);
+};
 
 describe('AddTodoForm', () => {
   it('renders correctly', () => {
-    render(<AddTodoForm onAddTodo={() => {}} />);
+    renderWithTheme(<AddTodoForm onAddTodo={() => {}} />);
     expect(screen.getByPlaceholderText('Add a new todo')).toBeInTheDocument();
     expect(screen.getByLabelText('Due Date')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Tags (comma-separated)')).toBeInTheDocument();
@@ -14,7 +19,7 @@ describe('AddTodoForm', () => {
 
   it('calls onAddTodo with the input value, due date, and tags when submitted', () => {
     const handleAddTodo = vi.fn();
-    render(<AddTodoForm onAddTodo={handleAddTodo} />);
+    renderWithTheme(<AddTodoForm onAddTodo={handleAddTodo} />);
 
     const input = screen.getByPlaceholderText('Add a new todo');
     const dateInput = screen.getByLabelText('Due Date');
@@ -37,7 +42,7 @@ describe('AddTodoForm', () => {
 
   it('calls onAddTodo with null for due date and empty array for tags if not provided', () => {
     const handleAddTodo = vi.fn();
-    render(<AddTodoForm onAddTodo={handleAddTodo} />);
+    renderWithTheme(<AddTodoForm onAddTodo={handleAddTodo} />);
 
     const input = screen.getByPlaceholderText('Add a new todo');
     const button = screen.getByRole('button', { name: /add/i });
@@ -51,7 +56,7 @@ describe('AddTodoForm', () => {
 
   it('does not call onAddTodo if input is empty', () => {
     const handleAddTodo = vi.fn();
-    render(<AddTodoForm onAddTodo={handleAddTodo} />);
+    renderWithTheme(<AddTodoForm onAddTodo={handleAddTodo} />);
 
     const button = screen.getByRole('button', { name: /add/i });
 
@@ -62,7 +67,7 @@ describe('AddTodoForm', () => {
 
   it('does not call onAddTodo if input is only whitespace', () => {
     const handleAddTodo = vi.fn();
-    render(<AddTodoForm onAddTodo={handleAddTodo} />);
+    renderWithTheme(<AddTodoForm onAddTodo={handleAddTodo} />);
 
     const input = screen.getByPlaceholderText('Add a new todo');
     const form = input.closest('form');
@@ -77,7 +82,7 @@ describe('AddTodoForm', () => {
   });
 
   it('displays an error message when input is empty on submit', () => {
-    render(<AddTodoForm onAddTodo={() => {}} />);
+    renderWithTheme(<AddTodoForm onAddTodo={() => {}} />);
     const button = screen.getByRole('button', { name: /add/i });
 
     // The button is disabled, so we need to submit the form directly
@@ -92,7 +97,7 @@ describe('AddTodoForm', () => {
   });
 
   it('displays an error message when input is only whitespace on submit', () => {
-    render(<AddTodoForm onAddTodo={() => {}} />);
+    renderWithTheme(<AddTodoForm onAddTodo={() => {}} />);
     const input = screen.getByPlaceholderText('Add a new todo');
     const button = screen.getByRole('button', { name: /add/i });
 
@@ -110,7 +115,7 @@ describe('AddTodoForm', () => {
   });
 
   it('hides the error message when user starts typing after an error', () => {
-    render(<AddTodoForm onAddTodo={() => {}} />);
+    renderWithTheme(<AddTodoForm onAddTodo={() => {}} />);
     const input = screen.getByPlaceholderText('Add a new todo');
     const button = screen.getByRole('button', { name: /add/i });
 
@@ -128,13 +133,13 @@ describe('AddTodoForm', () => {
   });
 
   it('button is disabled if input is empty', () => {
-    render(<AddTodoForm onAddTodo={() => {}} />);
+    renderWithTheme(<AddTodoForm onAddTodo={() => {}} />);
     const button = screen.getByRole('button', { name: /add/i });
     expect(button).toBeDisabled();
   });
 
   it('button is enabled when input has text', () => {
-    render(<AddTodoForm onAddTodo={() => {}} />);
+    renderWithTheme(<AddTodoForm onAddTodo={() => {}} />);
     const input = screen.getByPlaceholderText('Add a new todo');
     const button = screen.getByRole('button', { name: /add/i });
 
@@ -143,7 +148,7 @@ describe('AddTodoForm', () => {
   });
 
   it('button is disabled if input has only whitespace', () => {
-    render(<AddTodoForm onAddTodo={() => {}} />);
+    renderWithTheme(<AddTodoForm onAddTodo={() => {}} />);
     const input = screen.getByPlaceholderText('Add a new todo');
     const button = screen.getByRole('button', { name: /add/i });
 

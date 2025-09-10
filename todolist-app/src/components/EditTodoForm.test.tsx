@@ -3,12 +3,17 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import EditTodoForm from './EditTodoForm';
 import { describe, it, expect, vi } from 'vitest';
 import type { Todo } from '../types/todo';
+import { ThemeProvider } from '../contexts/ThemeContext'; // Import ThemeProvider
+
+const renderWithTheme = (component: React.ReactElement) => {
+  return render(<ThemeProvider>{component}</ThemeProvider>);
+};
 
 describe('EditTodoForm', () => {
   const mockTodo: Todo = {
     id: 1,
     text: 'Initial Todo Text',
-    completed: false,
+    status: 'todo', // Updated
     dueDate: null,
     tags: [],
   };
@@ -16,13 +21,13 @@ describe('EditTodoForm', () => {
   const mockTodoWithDate: Todo = {
     id: 2,
     text: 'Todo With Date',
-    completed: false,
+    status: 'todo', // Updated
     dueDate: '2025-12-31',
     tags: ['work', 'personal'],
   };
 
   it('renders correctly with initial todo text and no due date or tags', () => {
-    render(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
+    renderWithTheme(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
     expect(screen.getByDisplayValue('Initial Todo Text')).toBeInTheDocument();
     expect(screen.getByLabelText('Edit due date')).toHaveValue('');
     expect(screen.getByPlaceholderText('Tags (comma-separated)')).toHaveValue('');
@@ -30,7 +35,7 @@ describe('EditTodoForm', () => {
   });
 
   it('renders correctly with initial todo text, a due date, and tags', () => {
-    render(<EditTodoForm todo={mockTodoWithDate} onSave={() => {}} onCancel={() => {}} />);
+    renderWithTheme(<EditTodoForm todo={mockTodoWithDate} onSave={() => {}} onCancel={() => {}} />);
     expect(screen.getByDisplayValue('Todo With Date')).toBeInTheDocument();
     expect(screen.getByLabelText('Edit due date')).toHaveValue('2025-12-31');
     expect(screen.getByPlaceholderText('Tags (comma-separated)')).toHaveValue('work, personal');
@@ -38,7 +43,7 @@ describe('EditTodoForm', () => {
 
   it('calls onSave with the updated values when submitted', () => {
     const handleSave = vi.fn();
-    render(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={() => {}} />);
+    renderWithTheme(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={() => {}} />);
 
     const input = screen.getByDisplayValue('Initial Todo Text');
     const dateInput = screen.getByLabelText('Edit due date');
@@ -58,7 +63,7 @@ describe('EditTodoForm', () => {
 
   it('does not call onSave if input is empty', () => {
     const handleSave = vi.fn();
-    render(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={() => {}} />);
+    renderWithTheme(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={() => {}} />);
 
     const input = screen.getByDisplayValue('Initial Todo Text');
     const button = screen.getByRole('button', { name: /save/i });
@@ -71,7 +76,7 @@ describe('EditTodoForm', () => {
 
   it('does not call onSave if input is only whitespace', () => {
     const handleSave = vi.fn();
-    render(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={() => {}} />);
+    renderWithTheme(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={() => {}} />);
 
     const input = screen.getByDisplayValue('Initial Todo Text');
     const button = screen.getByRole('button', { name: /save/i });
@@ -83,7 +88,7 @@ describe('EditTodoForm', () => {
   });
 
   it('displays an error message when input is empty on submit', () => {
-    render(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
+    renderWithTheme(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
     const input = screen.getByDisplayValue('Initial Todo Text');
     const button = screen.getByRole('button', { name: /save/i });
 
@@ -96,7 +101,7 @@ describe('EditTodoForm', () => {
   });
 
   it('displays an error message when input is only whitespace on submit', () => {
-    render(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
+    renderWithTheme(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
     const input = screen.getByDisplayValue('Initial Todo Text');
     const button = screen.getByRole('button', { name: /save/i });
 
@@ -109,7 +114,7 @@ describe('EditTodoForm', () => {
   });
 
   it('hides the error message when user starts typing after an error', () => {
-    render(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
+    renderWithTheme(<EditTodoForm todo={mockTodo} onSave={() => {}} onCancel={() => {}} />);
     const input = screen.getByDisplayValue('Initial Todo Text');
     const button = screen.getByRole('button', { name: /save/i });
 
@@ -127,7 +132,7 @@ describe('EditTodoForm', () => {
   it('calls onCancel when Escape key is pressed', () => {
     const handleSave = vi.fn();
     const handleCancel = vi.fn();
-    render(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={handleCancel} />);
+    renderWithTheme(<EditTodoForm todo={mockTodo} onSave={handleSave} onCancel={handleCancel} />);
 
     const input = screen.getByDisplayValue('Initial Todo Text');
 

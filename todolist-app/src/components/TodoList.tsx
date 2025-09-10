@@ -1,7 +1,6 @@
 import React from 'react';
 import type { Todo } from '../types/todo';
 import TodoItem from './TodoItem';
-import styled from 'styled-components';
 
 interface TodoListProps {
   todos: Todo[];
@@ -9,36 +8,6 @@ interface TodoListProps {
   onUpdateStatus: (id: number, status: 'todo' | 'inProgress' | 'blocked' | 'done') => void;
   onUpdate: (id: number, newText: string, newDueDate: string | null, newTags: string[]) => void;
 }
-
-const ListContainer = styled.div`
-  background-color: ${({ theme }) => theme.cardBackground}; // Use theme.cardBackground
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); // Keep shadow for now, can be themed later
-`;
-
-const Title = styled.h2`
-  color: ${({ theme }) => theme.text}; // Use theme.text
-  margin-bottom: 15px;
-  text-align: center;
-`;
-
-const StyledList = styled.ul`
-  padding: 0;
-  list-style: none;
-  li {
-    border-bottom: 1px solid ${({ theme }) => theme.border}; // Use theme.border
-  }
-  li:last-child {
-    border-bottom: none;
-  }
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 40px 20px;
-  color: ${({ theme }) => theme.emptyState}; // Use theme.emptyState
-`;
 
 const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onUpdateStatus, onUpdate }) => {
   const statusOrder: Record<'todo' | 'inProgress' | 'blocked' | 'done', number> = {
@@ -54,20 +23,23 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onUpdateStatus, on
   });
 
   return (
-    <ListContainer>
-      <Title>Todo List</Title>
+    <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md mt-6">
+      <h2 className="text-2xl font-bold text-center mb-4 text-gray-800 dark:text-white">
+        Todo List
+      </h2>
       {todos.length === 0 ? (
-        <EmptyState>할 일을 추가해보세요</EmptyState>
+        <div className="text-center py-10 px-5 text-gray-500 dark:text-gray-400">
+          할 일을 추가해보세요
+        </div>
       ) : (
-        <StyledList>
+        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
           {sortedTodos.map(todo => (
             <TodoItem key={todo.id} todo={todo} onDelete={onDelete} onUpdateStatus={onUpdateStatus} onUpdate={onUpdate} />
           ))}
-        </StyledList>
+        </ul>
       )}
-    </ListContainer>
+    </div>
   );
 };
 
 export default TodoList;
-

@@ -1,72 +1,14 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import { clsx } from 'clsx';
 
 interface AddTodoFormProps {
   onAddTodo: (text: string, dueDate: string | null, tags: string[]) => void;
 }
 
-const Form = styled.form`
-  display: flex;
-  flex-wrap: wrap; // Allow items to wrap
-  gap: 10px;
-  margin-bottom: 20px;
-`;
-
-const InputContainer = styled.div`
-  display: flex;
-  flex-grow: 1; // Allow this container to grow
-  gap: 10px;
-  min-width: 250px; // Minimum width before wrapping
-`;
-
-const Input = styled.input<{ $hasError?: boolean }>`
-  flex-grow: 1;
-  padding: 10px;
-  border: 1px solid ${({ $hasError, theme }) => ($hasError ? theme.error : theme.border)}; // Use theme.error and theme.border
-  border-radius: 4px;
-  background-color: ${({ theme }) => theme.cardBackground}; // Use theme.cardBackground
-  color: ${({ theme }) => theme.text}; // Use theme.text
-`;
-
-const DateInput = styled(Input)`
-  flex-grow: 0;
-  min-width: 120px;
-`;
-
-const Button = styled.button`
-  padding: 10px 15px;
-  background-color: ${({ theme }) => theme.primary}; // Use theme.primary
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: ${({ theme }) => theme.primaryHover}; // Use theme.primaryHover
-  }
-
-  &:disabled {
-    background-color: ${({ theme }) => theme.border}; // Use theme.border
-    cursor: not-allowed;
-  }
-`;
-
-const VisuallyHiddenLabel = styled.label`
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-`;
-
 const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
   const [text, setText] = useState('');
   const [dueDate, setDueDate] = useState('');
-  const [tagsInput, setTagsInput] = useState(''); // New state for tags input
+  const [tagsInput, setTagsInput] = useState('');
   const [hasError, setHasError] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -75,16 +17,15 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
 
     if (!trimmedText) {
       setHasError(true);
-      setText(''); // Clear input on invalid submission
+      setText('');
       return;
     }
 
-    const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag !== ''); // Parse tags
-
-    onAddTodo(trimmedText, dueDate || null, tags); // Pass tags
+    const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+    onAddTodo(trimmedText, dueDate || null, tags);
     setText('');
     setDueDate('');
-    setTagsInput(''); // Clear tags input
+    setTagsInput('');
     setHasError(false);
   };
 
@@ -97,39 +38,56 @@ const AddTodoForm: React.FC<AddTodoFormProps> = ({ onAddTodo }) => {
 
   const isInputEmpty = text.trim() === '';
 
+  const inputClasses = clsx(
+    "flex-grow p-2.5 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100",
+    {
+      "border-red-500": hasError,
+      "border-gray-300 dark:border-gray-600": !hasError,
+    }
+  );
+
   return (
-    <Form onSubmit={handleSubmit}>
-      <InputContainer>
-        <VisuallyHiddenLabel htmlFor="add-todo-input">Add new todo</VisuallyHiddenLabel>
-        <Input
+    <form onSubmit={handleSubmit} className="flex flex-wrap items-start gap-2.5 mb-5">
+      <div className="flex flex-grow gap-2.5 min-w-full sm:min-w-[400px]">
+        <label htmlFor="add-todo-input" className="sr-only">Add new todo</label>
+        <input
           id="add-todo-input"
           type="text"
           placeholder="Add a new todo"
           value={text}
           onChange={handleTextChange}
-          $hasError={hasError}
+          className={inputClasses}
           aria-invalid={hasError ? 'true' : 'false'}
           aria-describedby={hasError ? 'add-todo-error' : undefined}
         />
-        <VisuallyHiddenLabel htmlFor="due-date-input">Due Date</VisuallyHiddenLabel>
-        <DateInput
+        <label htmlFor="due-date-input" className="sr-only">Due Date</label>
+        <input
           id="due-date-input"
           type="date"
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
+          className="p-2.5 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
         />
-        <VisuallyHiddenLabel htmlFor="tags-input">Tags (comma-separated)</VisuallyHiddenLabel>
-        <Input
+        <label htmlFor="tags-input" className="sr-only">Tags (comma-separated)</label>
+        <input
           id="tags-input"
           type="text"
           placeholder="Tags (comma-separated)"
           value={tagsInput}
           onChange={(e) => setTagsInput(e.target.value)}
+          className="flex-grow p-2.5 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
         />
-      </InputContainer>
-      {hasError && <span id="add-todo-error" style={{ color: 'red', fontSize: '0.8em' }}>Todo cannot be empty</span>} {/* Use theme.error for color */}
-      <Button type="submit" aria-label="Add todo" disabled={isInputEmpty}>Add</Button>
-    </Form>
+      </div>
+      <button 
+        type="submit" 
+        aria-label="Add todo" 
+        disabled={isInputEmpty}
+        className="px-4 py-2.5 bg-blue-600 text-white rounded-md cursor-pointer disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed hover:bg-blue-700"
+      >
+        Add
+      </button>
+      {hasError && <span id="add-todo-error" className="text-red-500 text-sm w-full mt-1">Todo cannot be empty</span>}
+    </form>
   );
 };
 

@@ -1,67 +1,41 @@
 import AddTodoForm from './components/AddTodoForm';
 import TodoList from './components/TodoList';
-import './App.css';
-import { useTodos } from './hooks/useTodos'; // Import useTodos
-import { ThemeProvider, useTheme } from './contexts/ThemeContext'; // Import ThemeProvider and useTheme
-import styled from 'styled-components'; // Import styled-components
-import type { ThemeName } from './styles/themes'; // Import ThemeName as a type
+import { useTodos } from './hooks/useTodos';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 
-const AppContainer = styled.div`
-  background-color: ${({ theme }) => theme.background};
-  color: ${({ theme }) => theme.text};
-  min-height: 100vh;
-  padding: 20px;
-`;
-
-const HeaderContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-`;
-
-const Title = styled.h1`
-  margin-bottom: 0;
-`;
-
-const ThemeToggleButton = styled.button`
-  padding: 10px 15px;
-  background-color: ${({ theme }) => theme.primary};
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover {
-    background-color: ${({ theme }) => theme.primaryHover};
-  }
-`;
-
-function AppContent() { // Renamed App to AppContent to use useTheme hook
-  const { todos, addTodo, deleteTodo, updateTodoStatus, updateTodo } = useTodos(); // Use the custom hook
-  const { themeName, setTheme } = useTheme(); // Use the useTheme hook
+function AppContent() {
+  const { todos, addTodo, deleteTodo, updateTodoStatus, updateTodo } = useTodos();
+  const { themeName, setTheme } = useTheme();
 
   const handleToggleTheme = () => {
     setTheme(themeName === 'light' ? 'dark' : 'light');
   };
 
   return (
-    <AppContainer>
-      <HeaderContainer>
-        <Title>Todo App</Title>
-        <ThemeToggleButton onClick={handleToggleTheme}>
-          Switch to {themeName === 'light' ? 'Dark' : 'Light'} Mode
-        </ThemeToggleButton>
-      </HeaderContainer>
-      <AddTodoForm onAddTodo={addTodo} /> {/* Pass addTodo as a prop */}
-      <TodoList todos={todos} onDelete={deleteTodo} onUpdateStatus={updateTodoStatus} onUpdate={updateTodo} /> {/* Pass todos, deleteTodo, updateTodoStatus, and updateTodo as props */}
-    </AppContainer>
+    <div className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white">
+            Todo App
+          </h1>
+          <button
+            onClick={handleToggleTheme}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors duration-200"
+          >
+            Switch to {themeName === 'light' ? 'Dark' : 'Light'} Mode
+          </button>
+        </div>
+        <AddTodoForm onAddTodo={addTodo} />
+        <TodoList todos={todos} onDelete={deleteTodo} onUpdateStatus={updateTodoStatus} onUpdate={updateTodo} />
+      </div>
+    </div>
   );
 }
 
 function App() {
   return (
     <ThemeProvider>
-      <AppContent /> {/* Render AppContent inside ThemeProvider */}
+      <AppContent />
     </ThemeProvider>
   );
 }

@@ -2,10 +2,15 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ConfirmationDialog from './ConfirmationDialog';
 import { describe, it, expect, vi } from 'vitest';
+import { ThemeProvider } from '../contexts/ThemeContext'; // Import ThemeProvider
+
+const renderWithTheme = (component: React.ReactElement) => {
+  return render(<ThemeProvider>{component}</ThemeProvider>);
+};
 
 describe('ConfirmationDialog', () => {
   it('renders correctly with message and buttons', () => {
-    render(
+    renderWithTheme(
       <ConfirmationDialog
         message="Are you sure?"
         onConfirm={() => {}}
@@ -20,7 +25,7 @@ describe('ConfirmationDialog', () => {
   it('calls onConfirm when confirm button is clicked', () => {
     const handleConfirm = vi.fn();
     const handleCancel = vi.fn();
-    render(
+    renderWithTheme(
       <ConfirmationDialog
         message="Are you sure?"
         onConfirm={handleConfirm}
@@ -37,7 +42,7 @@ describe('ConfirmationDialog', () => {
   it('calls onCancel when cancel button is clicked', () => {
     const handleConfirm = vi.fn();
     const handleCancel = vi.fn();
-    render(
+    renderWithTheme(
       <ConfirmationDialog
         message="Are you sure?"
         onConfirm={handleConfirm}

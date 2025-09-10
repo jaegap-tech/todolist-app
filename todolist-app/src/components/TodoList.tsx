@@ -10,18 +10,6 @@ interface TodoListProps {
 }
 
 const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onUpdateStatus, onUpdate }) => {
-  const statusOrder: Record<'todo' | 'inProgress' | 'blocked' | 'done', number> = {
-    inProgress: 1,
-    todo: 2,
-    blocked: 3,
-    done: 4,
-  };
-
-  // Create a mutable copy for sorting
-  const sortedTodos = [...todos].sort((a, b) => {
-    return statusOrder[a.status] - statusOrder[b.status];
-  });
-
   return (
     <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md mt-6">
       <h2 className="text-2xl font-bold text-center mb-4 text-gray-800 dark:text-white">
@@ -33,7 +21,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDelete, onUpdateStatus, on
         </div>
       ) : (
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-          {sortedTodos.map(todo => (
+          {todos.map(todo => (
             <TodoItem key={todo.id} todo={todo} onDelete={onDelete} onUpdateStatus={onUpdateStatus} onUpdate={onUpdate} />
           ))}
         </ul>

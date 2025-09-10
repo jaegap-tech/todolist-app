@@ -1,5 +1,5 @@
 import { saveToLocalStorage, loadFromLocalStorage } from './localStorage';
-import { vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Todo } from '../types/todo';
 
 describe('localStorage service', () => {
@@ -12,7 +12,13 @@ describe('localStorage service', () => {
   ];
 
   // Mock localStorage
-  let localStorageMock: any;
+  interface LocalStorageMock {
+    getItem: (key: string) => string | null;
+    setItem: (key: string, value: string) => void;
+    removeItem: (key: string) => void;
+    clear: () => void;
+  }
+  let localStorageMock: LocalStorageMock;
 
   beforeEach(() => {
     let store: { [key: string]: string } = {};

@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["vitest", "vitest/globals", "vite/client", "node"],
+    "lib": ["ES2020", "DOM"]
+  },
+  "files": ["vitest.d.ts"],
+  "include": ["src", "vitest.d.ts"]
+}

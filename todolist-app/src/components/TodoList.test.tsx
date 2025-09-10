@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import TodoList from './TodoList';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Todo } from '../types/todo';
 import { ThemeProvider } from '../contexts/ThemeContext';
 
@@ -62,29 +62,5 @@ describe('TodoList', () => {
     );
     expect(screen.getByText('할 일을 추가해보세요')).toBeInTheDocument();
     expect(screen.queryByTestId('mock-todo-item')).not.toBeInTheDocument();
-  });
-
-  it('sorts todos by status order (inProgress > todo > blocked > done)', () => {
-    renderWithTheme(
-      <TodoList
-        todos={mockTodos}
-        onDelete={mockOnDelete}
-        onUpdateStatus={mockOnUpdateStatus}
-        onUpdate={mockOnUpdate}
-      />
-    );
-    const items = screen.getAllByTestId('mock-todo-item');
-    // Expected order: inProgress (3), todo (1), blocked (4), done (2)
-    expect(items[0]).toHaveTextContent('Todo 3');
-    expect(items[0]).toHaveTextContent('inProgress');
-
-    expect(items[1]).toHaveTextContent('Todo 1');
-    expect(items[1]).toHaveTextContent('todo');
-
-    expect(items[2]).toHaveTextContent('Todo 4');
-    expect(items[2]).toHaveTextContent('blocked');
-
-    expect(items[3]).toHaveTextContent('Todo 2');
-    expect(items[3]).toHaveTextContent('done');
   });
 });

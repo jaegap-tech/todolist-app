@@ -1,7 +1,8 @@
 import AddTodoForm from './components/AddTodoForm';
 import TodoList from './components/TodoList';
 import { useTodos } from './hooks/useTodos';
-import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { useTheme } from './hooks/useTheme';
 
 function AppContent() {
   const { todos, addTodo, deleteTodo, updateTodoStatus, updateTodo } = useTodos();

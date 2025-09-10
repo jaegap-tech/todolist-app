@@ -15,6 +15,33 @@ export const useTodos = () => {
     saveToLocalStorage(TODO_STORAGE_KEY, todos);
   }, [todos]);
 
+  const sortTodos = (todosToSort: Todo[]): Todo[] => {
+    const statusOrder: Record<'todo' | 'inProgress' | 'blocked' | 'done', number> = {
+      inProgress: 1,
+      todo: 2,
+      blocked: 3,
+      done: 4,
+    };
+
+    return [...todosToSort].sort((a, b) => {
+      // Primary sort by status
+      const statusComparison = statusOrder[a.status] - statusOrder[b.status];
+      if (statusComparison !== 0) {
+        return statusComparison;
+      }
+
+      // Secondary sort by dueDate
+      if (a.dueDate === null && b.dueDate === null) return 0;
+      if (a.dueDate === null) return 1; // Null due dates go to the end
+      if (b.dueDate === null) return -1; // Null due dates go to the end
+
+      const dateA = new Date(a.dueDate);
+      const dateB = new Date(b.dueDate);
+
+      return dateA.getTime() - dateB.getTime();
+    });
+  };
+
   const addTodo = (text: string, dueDate: string | null, tags: string[]) => {
     const newTodo: Todo = {
       id: Date.now(), // Simple unique ID
@@ -23,26 +50,26 @@ export const useTodos = () => {
       dueDate,
       tags,
     };
-    setTodos((prevTodos) => [...prevTodos, newTodo]);
+    setTodos((prevTodos) => sortTodos([...prevTodos, newTodo]));
   };
 
   const updateTodo = (id: number, newText: string, newDueDate: string | null, newTags: string[]) => {
     setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
+      sortTodos(prevTodos.map((todo) =>
         todo.id === id ? { ...todo, text: newText, dueDate: newDueDate, tags: newTags } : todo
-      )
+      ))
     );
   };
 
   const deleteTodo = (id: number) => {
-    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+    setTodos((prevTodos) => sortTodos(prevTodos.filter((todo) => todo.id !== id)));
   };
 
   const updateTodoStatus = (id: number, status: 'todo' | 'inProgress' | 'blocked' | 'done') => {
     setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
+      sortTodos(prevTodos.map((todo) =>
         todo.id === id ? { ...todo, status } : todo
-      )
+      ))
     );
   };
 

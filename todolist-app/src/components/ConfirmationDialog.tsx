@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { clsx } from 'clsx';
 
 interface ConfirmationDialogProps {
   message: string;

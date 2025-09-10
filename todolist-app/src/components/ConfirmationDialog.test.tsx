@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ConfirmationDialog from './ConfirmationDialog';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ThemeProvider } from '../contexts/ThemeContext'; // Import ThemeProvider
 
 const renderWithTheme = (component: React.ReactElement) => {

@@ -1,8 +1,10 @@
+/// <reference types="vitest/globals" />
 import { renderHook, act } from '@testing-library/react';
 import { useTodos } from './useTodos';
 import { loadFromLocalStorage, saveToLocalStorage } from '../services/localStorage';
 import { DUMMY_TODOS } from '../data/todos';
-import { vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { vi } from 'vitest'; // Explicit import for vi
 import type { Todo } from '../types/todo';
 
 // Mock localStorage functions

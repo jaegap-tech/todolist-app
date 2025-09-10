@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import TodoItem from './TodoItem';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Todo } from '../types/todo';
 import { ThemeProvider } from '../contexts/ThemeContext';
 

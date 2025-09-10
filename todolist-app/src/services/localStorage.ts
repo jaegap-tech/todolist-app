@@ -1,33 +1,35 @@
 import type { Todo } from '../types/todo';
 
 // Type guard for Todo
-function isTodo(obj: any): obj is Todo {
+function isTodo(obj: unknown): obj is Todo {
   // Data migration from `completed` to `status`
-  if (typeof obj.completed === 'boolean') {
-    obj.status = obj.completed ? 'done' : 'todo';
-    delete obj.completed;
+  if (typeof obj === 'object' && obj !== null && 'completed' in obj) {
+    const todoObj = obj as Record<string, unknown>; // Cast to a record to access properties
+    if (typeof todoObj.completed === 'boolean') {
+      todoObj.status = todoObj.completed ? 'done' : 'todo';
+      delete todoObj.completed;
+    }
   }
 
   const validStatus = ['todo', 'inProgress', 'blocked', 'done'];
 
+  if (typeof obj !== 'object' || obj === null) {
+    return false;
+  }
+
+  const todo = obj as Record<string, unknown>; // Cast to a record to access properties
+
   return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    typeof obj.id === 'number' &&
-    typeof obj.text === 'string' &&
-    'status' in obj &&
-    typeof obj.status === 'string' &&
-    validStatus.includes(obj.status) &&
-    'dueDate' in obj &&
-    (typeof obj.dueDate === 'string' || obj.dueDate === null) &&
-    'tags' in obj &&
-    Array.isArray(obj.tags) &&
-    obj.tags.every((tag: any) => typeof tag === 'string')
+    'id' in todo && typeof todo.id === 'number' &&
+    'text' in todo && typeof todo.text === 'string' &&
+    'status' in todo && typeof todo.status === 'string' && validStatus.includes(todo.status) &&
+    'dueDate' in todo && (typeof todo.dueDate === 'string' || todo.dueDate === null) &&
+    'tags' in todo && Array.isArray(todo.tags) && todo.tags.every((tag: unknown) => typeof tag === 'string')
   );
 }
 
 // Type guard for an array of Todos
-function isTodoArray(arr: any[]): arr is Todo[] {
+function isTodoArray(arr: unknown[]): arr is Todo[] {
   return Array.isArray(arr) && arr.every(isTodo);
 }
 
@@ -63,7 +65,7 @@ export const loadFromLocalStorage = <T>(key: string): T | undefined => {
         });
       }
 
-      if (isTodoArray(parsedValue as any[])) {
+      if (isTodoArray(parsedValue as unknown[])) {
         return parsedValue as T;
       } else {
         console.warn(`Validation failed for key '${key}'. Data might be corrupted or not of expected type.`);

@@ -1,16 +1,9 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { loadFromLocalStorage, saveToLocalStorage } from '../services/localStorage';
-
-export type ThemeName = 'light' | 'dark';
-
-interface ThemeContextType {
-  themeName: ThemeName;
-  setTheme: (name: ThemeName) => void;
-}
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-const THEME_STORAGE_KEY = 'themePreference';
+import { THEME_STORAGE_KEY } from '../constants';
+import { ThemeContext } from './ThemeContext.utils';
+import type { ThemeName } from './ThemeContext.utils';
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [themeName, setThemeName] = useState<ThemeName>(() => {
@@ -40,12 +33,4 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       {children}
     </ThemeContext.Provider>
   );
-};
-
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
 };

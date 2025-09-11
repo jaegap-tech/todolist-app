@@ -24,7 +24,8 @@ function isTodo(obj: unknown): obj is Todo {
     'text' in todo && typeof todo.text === 'string' &&
     'status' in todo && typeof todo.status === 'string' && validStatus.includes(todo.status) &&
     'dueDate' in todo && (typeof todo.dueDate === 'string' || todo.dueDate === null) &&
-    'tags' in todo && Array.isArray(todo.tags) && todo.tags.every((tag: unknown) => typeof tag === 'string')
+    'tags' in todo && Array.isArray(todo.tags) && todo.tags.every((tag: unknown) => typeof tag === 'string') &&
+    'flagged' in todo && typeof todo.flagged === 'boolean'
   );
 }
 
@@ -61,6 +62,9 @@ export const loadFromLocalStorage = <T>(key: string): T | undefined => {
           }
           if (!('tags' in todo)) {
             todo.tags = []; // Default to empty array
+          }
+          if (!('flagged' in todo)) {
+            todo.flagged = false; // Default to false
           }
         });
       }

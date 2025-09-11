@@ -24,13 +24,17 @@ export const useTodos = () => {
     };
 
     return [...todosToSort].sort((a, b) => {
-      // Primary sort by status
+      // Primary sort by flag
+      if (a.flagged && !b.flagged) return -1;
+      if (!a.flagged && b.flagged) return 1;
+
+      // Secondary sort by status
       const statusComparison = statusOrder[a.status] - statusOrder[b.status];
       if (statusComparison !== 0) {
         return statusComparison;
       }
 
-      // Secondary sort by dueDate
+      // Tertiary sort by dueDate
       if (a.dueDate === null && b.dueDate === null) return 0;
       if (a.dueDate === null) return 1; // Null due dates go to the end
       if (b.dueDate === null) return -1; // Null due dates go to the end
@@ -49,6 +53,7 @@ export const useTodos = () => {
       status: 'todo',
       dueDate,
       tags,
+      flagged: false, // Add flagged property
     };
     setTodos((prevTodos) => sortTodos([...prevTodos, newTodo]));
   };
@@ -73,11 +78,22 @@ export const useTodos = () => {
     );
   };
 
+  const toggleFlag = (id: number) => {
+    setTodos((prevTodos) =>
+      sortTodos(
+        prevTodos.map((todo) =>
+          todo.id === id ? { ...todo, flagged: !todo.flagged } : todo
+        )
+      )
+    );
+  };
+
   return {
     todos,
     addTodo,
     updateTodo,
     deleteTodo,
     updateTodoStatus,
+    toggleFlag,
   };
 };

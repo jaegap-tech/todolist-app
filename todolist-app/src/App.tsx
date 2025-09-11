@@ -5,7 +5,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { useTheme } from './hooks/useTheme';
 
 function AppContent() {
-  const { todos, addTodo, deleteTodo, updateTodoStatus, updateTodo } = useTodos();
+  const { todos, addTodo, deleteTodo, updateTodoStatus, updateTodo, toggleFlag } = useTodos();
   const { themeName, setTheme } = useTheme();
 
   const handleToggleTheme = () => {
@@ -27,7 +27,7 @@ function AppContent() {
           </button>
         </div>
         <AddTodoForm onAddTodo={addTodo} />
-        <TodoList todos={todos} onDelete={deleteTodo} onUpdateStatus={updateTodoStatus} onUpdate={updateTodo} />
+        <TodoList todos={todos} onDelete={deleteTodo} onUpdateStatus={updateTodoStatus} onUpdate={updateTodo} onToggleFlag={toggleFlag} />
       </div>
     </div>
   );

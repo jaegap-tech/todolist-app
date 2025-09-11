@@ -4,4 +4,5 @@ export interface Todo {
   status: 'todo' | 'inProgress' | 'blocked' | 'done';
   dueDate: string | null;
   tags: string[];
+  flagged: boolean;
 }

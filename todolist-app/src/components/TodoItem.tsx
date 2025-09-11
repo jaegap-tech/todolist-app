@@ -30,9 +30,10 @@ interface TodoItemProps {
   onDelete: (id: number) => void;
   onUpdateStatus: (id: number, status: 'todo' | 'inProgress' | 'blocked' | 'done') => void;
   onUpdate: (id: number, newText: string, newDueDate: string | null, newTags: string[]) => void;
+  onToggleFlag: (id: number) => void; // Add this line
 }
 
-const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onUpdateStatus, onUpdate }) => {
+const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onUpdateStatus, onUpdate, onToggleFlag }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -66,6 +67,23 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onUpdateStatus, onU
       'line-through text-gray-500 dark:text-gray-400 opacity-60': todo.status === 'done',
       'text-gray-800 dark:text-gray-100': todo.status !== 'done',
     }
+  );
+
+  const flagIcon = (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className={clsx("h-6 w-6 cursor-pointer transition-colors duration-200", {
+        'text-yellow-500 hover:text-yellow-600': todo.flagged,
+        'text-gray-400 hover:text-gray-500': !todo.flagged,
+      })}
+      fill={todo.flagged ? 'currentColor' : 'none'}
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="2"
+      onClick={() => onToggleFlag(todo.id)}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1v12zM4 22V15" />
+    </svg>
   );
 
   return (
@@ -117,7 +135,8 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onUpdateStatus, onU
               </div>
             )}
           </div>
-          <div className="ml-auto flex gap-2">
+          <div className="ml-auto flex items-center gap-2">
+            {flagIcon}
             <button onClick={() => setIsEditing(true)} aria-label={`Edit "${todo.text}"`} className="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600">Edit</button>
             <button onClick={() => setShowConfirmDialog(true)} aria-label={`Delete "${todo.text}"`} className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600">Delete</button>
           </div>

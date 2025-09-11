@@ -7,8 +7,8 @@ describe('localStorage service', () => {
   const MOCK_VALUE = { data: 'testData' };
   const MOCK_TODOS_KEY = 'todos';
   const MOCK_TODOS_VALUE: Todo[] = [
-    { id: 1, text: 'Todo 1', status: 'todo', dueDate: null, tags: [] },
-    { id: 2, text: 'Todo 2', status: 'done', dueDate: '2025-12-31', tags: ['work', 'urgent'] },
+    { id: 1, text: 'Todo 1', status: 'todo', dueDate: null, tags: [], flagged: false },
+    { id: 2, text: 'Todo 2', status: 'done', dueDate: '2025-12-31', tags: ['work', 'urgent'], flagged: false },
   ];
 
   // Mock localStorage

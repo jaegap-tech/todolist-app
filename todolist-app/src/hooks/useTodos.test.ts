@@ -15,7 +15,7 @@ vi.mock('../services/localStorage', () => ({
 
 // Mock DUMMY_TODOS to control initial state
 vi.mock('../data/todos', () => ({
-  DUMMY_TODOS: [{ id: 99, text: 'Dummy Todo', status: 'todo', dueDate: null, tags: [] }],
+  DUMMY_TODOS: [{ id: 99, text: 'Dummy Todo', status: 'todo', dueDate: null, tags: [], flagged: false }],
 }));
 
 describe('useTodos', () => {
@@ -26,7 +26,7 @@ describe('useTodos', () => {
   });
 
   it('loads todos from local storage on initial render', () => {
-    const storedData: Todo[] = [{ id: 1, text: 'Stored Todo', status: 'todo', dueDate: null, tags: [] }];
+    const storedData: Todo[] = [{ id: 1, text: 'Stored Todo', status: 'todo', dueDate: null, tags: [], flagged: false }];
     (loadFromLocalStorage as vi.Mock).mockReturnValue(storedData);
 
     const { result } = renderHook(() => useTodos());
@@ -44,7 +44,7 @@ describe('useTodos', () => {
     expect(result.current.todos).toEqual(DUMMY_TODOS);
   });
 
-  it('adds a new todo with a due date and tags', () => {
+  it('adds a new todo with a due date and tags and flagged as false', () => {
     (loadFromLocalStorage as vi.Mock).mockReturnValue([]);
     const { result } = renderHook(() => useTodos());
     const dueDate = '2025-12-31';
@@ -59,10 +59,11 @@ describe('useTodos', () => {
     expect(result.current.todos[0].status).toBe('todo');
     expect(result.current.todos[0].dueDate).toBe(dueDate);
     expect(result.current.todos[0].tags).toEqual(tags);
+    expect(result.current.todos[0].flagged).toBe(false);
   });
 
   it('updates an existing todo with a new due date and tags', () => {
-    const initialTodos: Todo[] = [{ id: 1, text: 'Original Todo', status: 'todo', dueDate: null, tags: [] }];
+    const initialTodos: Todo[] = [{ id: 1, text: 'Original Todo', status: 'todo', dueDate: null, tags: [], flagged: false }];
     (loadFromLocalStorage as vi.Mock).mockReturnValue(initialTodos);
     const { result } = renderHook(() => useTodos());
     const newDueDate = '2026-01-15';
@@ -78,7 +79,7 @@ describe('useTodos', () => {
   });
 
   it('deletes a todo', () => {
-    const initialTodos: Todo[] = [{ id: 1, text: 'Todo to delete', status: 'todo', dueDate: null, tags: [] }];
+    const initialTodos: Todo[] = [{ id: 1, text: 'Todo to delete', status: 'todo', dueDate: null, tags: [], flagged: false }];
     (loadFromLocalStorage as vi.Mock).mockReturnValue(initialTodos);
     const { result } = renderHook(() => useTodos());
 
@@ -90,7 +91,7 @@ describe('useTodos', () => {
   });
 
   it('updates a todo status', () => {
-    const initialTodos: Todo[] = [{ id: 1, text: 'Status Todo', status: 'todo', dueDate: null, tags: [] }];
+    const initialTodos: Todo[] = [{ id: 1, text: 'Status Todo', status: 'todo', dueDate: null, tags: [], flagged: false }];
     (loadFromLocalStorage as vi.Mock).mockReturnValue(initialTodos);
     const { result } = renderHook(() => useTodos());
 
@@ -105,6 +106,42 @@ describe('useTodos', () => {
     });
 
     expect(result.current.todos[0].status).toBe('done');
+  });
+
+  it('toggles the flagged status of a todo', () => {
+    const initialTodos: Todo[] = [{ id: 1, text: 'Flag Todo', status: 'todo', dueDate: null, tags: [], flagged: false }];
+    (loadFromLocalStorage as vi.Mock).mockReturnValue(initialTodos);
+    const { result } = renderHook(() => useTodos());
+
+    // Flag the todo
+    act(() => {
+      result.current.toggleFlag(1);
+    });
+    expect(result.current.todos[0].flagged).toBe(true);
+
+    // Unflag the todo
+    act(() => {
+      result.current.toggleFlag(1);
+    });
+    expect(result.current.todos[0].flagged).toBe(false);
+  });
+
+  it('sorts todos with flagged items first', () => {
+    const initialTodos: Todo[] = [
+      { id: 1, text: 'Normal Todo', status: 'todo', dueDate: null, tags: [], flagged: false },
+      { id: 2, text: 'Flagged Todo', status: 'todo', dueDate: null, tags: [], flagged: true },
+      { id: 3, text: 'Another Normal', status: 'inProgress', dueDate: null, tags: [], flagged: false },
+    ];
+    (loadFromLocalStorage as vi.Mock).mockReturnValue(initialTodos);
+    const { result } = renderHook(() => useTodos());
+
+    // The flagged todo should be first
+    expect(result.current.todos[0].id).toBe(2);
+    expect(result.current.todos[0].flagged).toBe(true);
+
+    // Check secondary sorting (inProgress before todo)
+    expect(result.current.todos[1].id).toBe(3);
+    expect(result.current.todos[2].id).toBe(1);
   });
 
   it('saves todos to local storage when todos change', () => {

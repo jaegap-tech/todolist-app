@@ -1,15 +1,21 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { Todo } from '../types/todo';
-import { loadFromLocalStorage, saveToLocalStorage } from '../services/localStorage';
-import { DUMMY_TODOS } from '../data/todos'; // For initial load if local storage is empty
-
-const TODO_STORAGE_KEY = 'todos';
+import { getTodos, createTodo, updateTodoApi, deleteTodoApi } from '../services/todoApi';
 
 export const useTodos = () => {
-  const [internalTodos, setInternalTodos] = useState<Todo[]>(() => {
-    const storedTodos = loadFromLocalStorage<Todo[]>(TODO_STORAGE_KEY);
-    return storedTodos || DUMMY_TODOS; // Load from storage or use dummy data
-  });
+  const [internalTodos, setInternalTodos] = useState<Todo[]>([]);
+
+  useEffect(() => {
+    const fetchTodos = async () => {
+      try {
+        const todos = await getTodos();
+        setInternalTodos(todos);
+      } catch (error) {
+        console.error('Error fetching todos:', error);
+      }
+    };
+    fetchTodos();
+  }, []);
 
   const sortedTodos = useMemo(() => {
     const statusOrder: Record<'todo' | 'inProgress' | 'blocked' | 'done', number> = {
@@ -42,48 +48,70 @@ export const useTodos = () => {
     });
   }, [internalTodos]);
 
-  useEffect(() => {
-    saveToLocalStorage(TODO_STORAGE_KEY, internalTodos);
-  }, [internalTodos]);
-
-  const addTodo = (text: string, dueDate: string | null, tags: string[]) => {
-    const newTodo: Todo = {
-      id: Date.now(), // Simple unique ID
-      text,
-      status: 'todo',
-      dueDate,
-      tags,
-      flagged: false, // Add flagged property
-    };
-    setInternalTodos((prevTodos) => [...prevTodos, newTodo]);
+  const addTodo = async (text: string, dueDate: string | null, tags: string[]) => {
+    try {
+      const newTodo = await createTodo({
+        text,
+        status: 'todo',
+        dueDate,
+        tags,
+        flagged: false,
+      });
+      setInternalTodos((prevTodos) => [...prevTodos, newTodo]);
+    } catch (error) {
+      console.error('Error adding todo:', error);
+    }
   };
 
-  const updateTodo = (id: number, newText: string, newDueDate: string | null, newTags: string[]) => {
-    setInternalTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === id ? { ...todo, text: newText, dueDate: newDueDate, tags: newTags } : todo
-      )
-    );
+  const updateTodo = async (id: number, newText: string, newDueDate: string | null, newTags: string[]) => {
+    try {
+      const todoToUpdate = internalTodos.find((todo) => todo.id === id);
+      if (todoToUpdate) {
+        const updated = await updateTodoApi({ ...todoToUpdate, text: newText, dueDate: newDueDate, tags: newTags });
+        setInternalTodos((prevTodos) =>
+          prevTodos.map((todo) => (todo.id === id ? updated : todo))
+        );
+      }
+    } catch (error) {
+      console.error('Error updating todo:', error);
+    }
   };
 
-  const deleteTodo = (id: number) => {
-    setInternalTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+  const deleteTodo = async (id: number) => {
+    try {
+      await deleteTodoApi(id);
+      setInternalTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+    }
   };
 
-  const updateTodoStatus = (id: number, status: 'todo' | 'inProgress' | 'blocked' | 'done') => {
-    setInternalTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === id ? { ...todo, status } : todo
-      )
-    );
+  const updateTodoStatus = async (id: number, status: 'todo' | 'inProgress' | 'blocked' | 'done') => {
+    try {
+      const todoToUpdate = internalTodos.find((todo) => todo.id === id);
+      if (todoToUpdate) {
+        const updated = await updateTodoApi({ ...todoToUpdate, status });
+        setInternalTodos((prevTodos) =>
+          prevTodos.map((todo) => (todo.id === id ? updated : todo))
+        );
+      }
+    } catch (error) {
+      console.error('Error updating todo status:', error);
+    }
   };
 
-  const toggleFlag = (id: number) => {
-    setInternalTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === id ? { ...todo, flagged: !todo.flagged } : todo
-      )
-    );
+  const toggleFlag = async (id: number) => {
+    try {
+      const todoToUpdate = internalTodos.find((todo) => todo.id === id);
+      if (todoToUpdate) {
+        const updated = await updateTodoApi({ ...todoToUpdate, flagged: !todoToUpdate.flagged });
+        setInternalTodos((prevTodos) =>
+          prevTodos.map((todo) => (todo.id === id ? updated : todo))
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling todo flag:', error);
+    }
   };
 
   return {

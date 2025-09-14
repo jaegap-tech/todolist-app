@@ -1,0 +1,18 @@
+{
+  "todos": [
+    {
+      "id": 1757840008054,
+      "text": "Updated todo",
+      "status": "done",
+      "dueDate": "2025-12-31",
+      "tags": [
+        "test",
+        "updated"
+      ],
+      "flagged": false
+    }
+  ],
+  "settings": {
+    "theme": "dark"
+  }
+}

@@ -60,37 +60,37 @@ describe('TodoItem', () => {
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
   });
 
-  it('calls onToggleFlag when the flag icon is clicked', () => {
+  it('calls onToggleFlag when the star icon is clicked', () => {
     const handleToggleFlag = vi.fn();
     renderWithTheme(
       <TodoItem todo={mockTodo} onDelete={() => {}} onUpdateStatus={() => {}} onUpdate={() => {}} onToggleFlag={handleToggleFlag} />
     );
 
-    const flagIcon = screen.getByTestId(`flag-icon-${mockTodo.id}`);
-    fireEvent.click(flagIcon);
+    const starIcon = screen.getByTestId(`star-icon-${mockTodo.id}`);
+    fireEvent.click(starIcon);
 
     expect(handleToggleFlag).toHaveBeenCalledTimes(1);
     expect(handleToggleFlag).toHaveBeenCalledWith(mockTodo.id);
   });
 
-  it('renders the flag icon with correct styles (not flagged)', () => {
+  it('renders the star icon with correct styles (not flagged)', () => {
     renderWithTheme(
       <TodoItem todo={mockTodo} onDelete={() => {}} onUpdateStatus={() => {}} onUpdate={() => {}} onToggleFlag={() => {}} />
     );
-    const flagIcon = screen.getByTestId(`flag-icon-${mockTodo.id}`);
+    const starIcon = screen.getByTestId(`star-icon-${mockTodo.id}`);
     // Check for the 'not flagged' color
-    expect(flagIcon.getAttribute('fill')).toBe('none');
-    expect(flagIcon.classList.contains('text-gray-400')).toBe(true);
+    expect(starIcon.getAttribute('fill')).toBe('none');
+    expect(starIcon.classList.contains('text-gray-400')).toBe(true);
   });
 
-  it('renders the flag icon with correct styles (flagged)', () => {
+  it('renders the star icon with correct styles (flagged)', () => {
     renderWithTheme(
       <TodoItem todo={mockTodoFlagged} onDelete={() => {}} onUpdateStatus={() => {}} onUpdate={() => {}} onToggleFlag={() => {}} />
     );
-    const flagIcon = screen.getByTestId(`flag-icon-${mockTodoFlagged.id}`);
+    const starIcon = screen.getByTestId(`star-icon-${mockTodoFlagged.id}`);
     // Check for the 'flagged' color
-    expect(flagIcon.getAttribute('fill')).toBe('currentColor');
-    expect(flagIcon.classList.contains('text-yellow-500')).toBe(true);
+    expect(starIcon.getAttribute('fill')).toBe('currentColor');
+    expect(starIcon.classList.contains('text-yellow-500')).toBe(true);
   });
 
   it('opens and closes status popover on badge click', async () => {

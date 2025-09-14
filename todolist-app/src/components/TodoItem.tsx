@@ -69,7 +69,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onUpdateStatus, onU
     }
   );
 
-  const flagIcon = (
+  const starIcon = (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       className={clsx("h-6 w-6 cursor-pointer transition-colors duration-200", {
@@ -79,11 +79,15 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onUpdateStatus, onU
       fill={todo.flagged ? 'currentColor' : 'none'}
       viewBox="0 0 24 24"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth={todo.flagged ? 0 : 2}
       onClick={() => onToggleFlag(todo.id)}
-      data-testid={`flag-icon-${todo.id}`}
+      data-testid={`star-icon-${todo.id}`}
     >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1v12zM4 22V15" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.654.052.918.924.448 1.405l-4.118 3.986a.562.562 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 21.03a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.118-3.986c-.47-.481-.206-1.353.448-1.405l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
+      />
     </svg>
   );
 
@@ -137,7 +141,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onUpdateStatus, onU
             )}
           </div>
           <div className="ml-auto flex items-center gap-2">
-            {flagIcon}
+            {starIcon}
             <button onClick={() => setIsEditing(true)} aria-label={`Edit "${todo.text}"`} className="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600">Edit</button>
             <button onClick={() => setShowConfirmDialog(true)} aria-label={`Delete "${todo.text}"`} className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600">Delete</button>
           </div>

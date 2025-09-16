@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Application Data Schema",
+  "description": "A unified schema for all data managed by the application, including backend-stored todos and client-stored theme preferences. Version: 1.0.0",
+  "type": "object",
+  "definitions": {
+    "todoItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "description": "The unique identifier for the todo item."
+        },
+        "text": {
+          "type": "string",
+          "description": "The content or description of the todo item."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the todo item.",
+          "enum": ["todo", "inProgress", "blocked", "done"]
+        },
+        "dueDate": {
+          "type": ["string", "null"],
+          "description": "The due date of the todo item in ISO 8601 format. Can be null if no due date is set.",
+          "format": "date-time"
+        },
+        "tags": {
+          "type": "array",
+          "description": "A list of tags associated with the todo item.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "flagged": {
+          "type": "boolean",
+          "description": "Indicates if the todo item is flagged for importance."
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "status",
+        "dueDate",
+        "tags",
+        "flagged"
+      ]
+    },
+    "theme": {
+      "type": "string",
+      "enum": ["light", "dark"]
+    }
+  },
+  "properties": {
+    "version": {
+      "const": 1,
+      "description": "The constant version number for this schema, which is 1."
+    },
+    "todos": {
+      "description": "The list of todo items, managed by the backend API.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/todoItem"
+      }
+    },
+    "theme": {
+      "description": "The UI theme preference, stored in localStorage.",
+      "$ref": "#/definitions/theme"
+    }
+  }
+}

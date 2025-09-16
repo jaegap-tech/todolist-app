@@ -33,4 +33,18 @@ async function writeData(data) {
   }
 }
 
-module.exports = { readData, writeData };
+async function migrateData() {
+  console.log('Checking data version for migration...');
+  let data = await readData();
+
+  if (!data.hasOwnProperty('version')) {
+    console.log('Data is version 0. Migrating to version 1...');
+    data.version = 1;
+    await writeData(data);
+    console.log('Migration to version 1 complete.');
+  } else {
+    console.log(`Data is already version ${data.version} or newer. No migration needed.`);
+  }
+}
+
+module.exports = { readData, writeData, migrateData };

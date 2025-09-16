@@ -91,8 +91,29 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onUpdateStatus, onU
     </svg>
   );
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let isDueToday = false;
+  let isOverdue = false;
+
+  if (todo.dueDate) {
+    const dueDateParts = todo.dueDate.split('-').map(part => parseInt(part, 10));
+    const dueDate = new Date(dueDateParts[0], dueDateParts[1] - 1, dueDateParts[2]);
+    if (dueDate.getTime() === today.getTime()) {
+      isDueToday = true;
+    } else if (dueDate < today) {
+      isOverdue = true;
+    }
+  }
+
   return (
-    <li className="flex items-center p-2.5">
+    <li className={clsx(
+      "flex items-center p-2.5 border-l-[3px]",
+      isOverdue && todo.status !== 'done' ? 'border-l-[#E57373]' :
+      isDueToday && todo.status !== 'done' ? 'border-l-[#FFB74D]' :
+      'border-l-transparent'
+    )}>
       {isEditing ? (
         <EditTodoForm todo={todo} onSave={handleSave} onCancel={() => setIsEditing(false)} />
       ) : (
